@@ -1,0 +1,17 @@
+  /invited/shorten:
+    post:
+      summary: "Shorten a URL link"
+      description: "Accepts an original URL and generates a random short URL, which expires 24 hours after its creation."
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: './components/schemas.yaml#/InvitedPost'
+      responses:
+        201:
+          description: Short URL generated successfully.
+        400:
+          $ref: './components/responses.yaml#/BadRequest'
+        500:
+          $ref: './components/responses.yaml#/ServerError'

@@ -1,0 +1,157 @@
+    User:
+      type: object
+      properties:
+        username:
+          type: string
+          description: The username of the user
+          example: newUser123
+        email:
+          type: string
+          format: email
+          description: The email of the user
+          example: newEmail@example.com
+        isAdmin:
+          type: boolean
+          description: Indicates whether the user has admin privileges
+          default: false
+    
+    UserComplement:
+      type: object
+      properties:
+        _id:
+          type: string
+          description: Unique identifier for the user
+        urls:
+          type: array
+          items:
+            type: string
+            format: uuid
+            description: Array of URLs associated with the user (references to other documents)
+        createdAt:
+          type: string
+          format: date-time
+          description: The date and time when the user was created
+        updatedAt:
+          type: string
+          format: date-time
+          description: The date and time when the user was last updated
+
+    InvitedPost:
+      type: object
+      properties:
+        originalUrl:
+          type: string
+          description: The original URL to shorten.
+
+    URLS:
+      type: object
+      properties:
+        originalUrl:
+          type: string
+          description: Original URL.
+          example: "https://example.com"
+        shortId:
+          type: string
+          description: Custom url ID.
+          example: "CustomID"
+        user:
+          type: string
+          description: "ID of the user who owns the URL (MongoDB ObjectId)."
+          example: "60d5f3a0f8d2e87d8f0f8c9b"
+          nullable: true
+      required:
+        - originalUrl
+        - shortId
+      additionalProperties: false
+
+    Click:
+      type: object
+      properties:
+        url:
+          type: string
+          format: uuid
+          description: The unique identifier for the associated URL.
+          example: "60d5f484f1e6a3b6a1b12345"
+        ip:
+          type: string
+          description: The IP address of the user who clicked the link.
+          example: "192.168.1.10"
+        userAgent:
+          type: string
+          description: The user-agent string of the browser or device.
+          example: "Mozilla/5.0 (Windows NT 10.0; Win64; x64)"
+        date:
+          type: string
+          format: date-time
+          description: The date and time when the click occurred.
+          example: "2024-06-15T14:23:00Z"
+        location:
+          type: string
+          description: The location of the user (city and country).
+          example: "New York, USA"
+        deviceType:
+          type: string
+          enum:
+            - mobile
+            - desktop
+            - tablet
+          description: The type of device used for the click.
+          example: "mobile"
+
+    GeneralClicks:
+      type: object
+      properties:
+        shortLink:
+          type: string
+          example: "abc123"
+        originalUrl:
+          type: string
+          example: "https://www.example.com"
+        totalClicks:
+          type: integer
+          example: 123
+
+    DetailedClicks:
+      type: object
+      properties:          
+        locationsCount:
+          type: object
+          additionalProperties:
+            type: integer
+          example:
+            "USA": 100
+            "Canada": 23
+        mobileClicks:
+          type: integer
+          example: 85
+        desktopClicks:
+          type: integer
+          example: 38
+
+    Pagination:
+      type: object
+      properties:
+        totalUrls:
+          type: integer
+          example: 50
+          description: "Total number of URLs for the user (calculated dynamically)"
+        totalPages:
+          type: integer
+          example: 5
+          description: "Total number of pages for pagination (calculated dynamically)"
+        currentPage:
+          type: integer
+          example: 1
+          description: "Current page number (provided by the user)"
+        limit:
+          type: integer
+          example: 10
+          description: "Limit of results per page (provided by the user)"
+
+    DetailedUrlStats:
+      allOf:
+        - $ref: '#/GeneralClicks'
+        - type: object
+          properties:
+            detailedClicks:
+              $ref: '#/DetailedClicks'

@@ -1,0 +1,22 @@
+name: Tarea programada de eliminación de cuentas
+
+on:
+  schedule:
+    # Esto ejecutará el workflow todos los días a medianoche UTC
+    - cron: '0 0 * * *'
+
+jobs:
+  delete-old-users:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Revisar el repositorio
+        uses: actions/checkout@v2
+
+      - name: Hacer solicitud para eliminar cuentas pendientes
+        run: |
+          curl -X DELETE ${{ secrets.API_http }} \
+          -H "Authorization: Bearer ${{ secrets.API_PASSWORD }}"
+          
+      - name: Confirmación de eliminación
+        run: echo "Se ha solicitado la eliminación de cuentas programadas."

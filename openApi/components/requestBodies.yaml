@@ -1,0 +1,37 @@
+    UserUpdate:
+      description: "Datos para actualizar un usuario."
+      required: true
+      content:
+        application/json:
+          schema:
+            $ref: './schemas.yaml#/User'
+
+    PasswordChange:
+      description: "Datos para cambiar la contraseña de un usuario."
+      required: true
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              currentPassword:
+                type: string
+                description: Contraseña actual del usuario.
+                example: "123456"
+              newPassword:
+                type: string
+                description: Nueva contraseña que desea establecer.
+                example: "newpassword123"
+              confirmPassword:
+                type: string
+                description: Confirmación de la nueva contraseña.
+                example: "newpassword123"
+            additionalProperties: false
+
+    URLS:
+      description: "Original URL and Custom ID"
+      content:
+        application/json:
+          schema:
+            $ref: './schemas.yaml#/URLS'
+            

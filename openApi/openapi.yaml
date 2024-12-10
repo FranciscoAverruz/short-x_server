@@ -1,0 +1,36 @@
+openapi: 3.0.0
+info:
+  title: "API de Acortador de URL"
+  version: "1.0.0"
+  description: "Una API RESTful para gestionar URLs acortadas"
+servers:
+  - url: "http://localhost:3500/api"
+
+tags:
+  - name: "Authentication"
+    description: "Operations related to login, registration, and URL redirection."
+  - name: "User"
+    description: "Operations for managing users and their data."
+  - name: "URLs"
+    description: "Operations to shorten, redirect, and manage URLs."
+  - name: "Stats"
+    description: "Operations for obtaining statistics of user URLs."
+  - name: "Administration"
+    description: "Administrative operations requiring administrator permissions."
+
+security:
+  - BearerAuth: []
+
+paths:
+  $ref: './index.yaml' # Referencia todo el contenido del directorio `docs/`
+
+components:
+  $ref: './components/security.yaml'
+  schemas:
+    $ref: './components/schemas.yaml'
+  responses:
+    $ref: './components/responses.yaml'
+  parameters:
+    $ref: './components/parameters.yaml'
+  requestBodies:
+    $ref: './components/requestBodies.yaml'

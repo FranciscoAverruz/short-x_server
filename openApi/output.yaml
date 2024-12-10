@@ -1,0 +1,1178 @@
+openapi: 3.0.0
+info:
+  title: API de Acortador de URL
+  version: 1.0.0
+  description: Una API RESTful para gestionar URLs acortadas
+servers:
+  - url: 'http://localhost:3500/api'
+tags:
+  - name: Authentication
+    description: 'Operations related to login, registration, and URL redirection.'
+  - name: User
+    description: Operations for managing users and their data.
+  - name: URLs
+    description: 'Operations to shorten, redirect, and manage URLs.'
+  - name: Stats
+    description: Operations for obtaining statistics of user URLs.
+  - name: Administration
+    description: Administrative operations requiring administrator permissions.
+security:
+  - BearerAuth: []
+paths:
+  /admin/all-users:
+    get:
+      summary: Obtener todos los usuarios
+      description: Devuelve una lista de todos los usuarios registrados.
+      operationId: retUsersAll
+      responses:
+        '200':
+          description: Lista de todos los usuarios
+        '404':
+          description: No se encontraron usuarios
+  /admin:
+    post:
+      summary: Crear nuevo usuario
+      description: Crea un nuevo usuario en el sistema.
+      operationId: createUser
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                username:
+                  type: string
+                password:
+                  type: string
+      responses:
+        '201':
+          description: Usuario creado exitosamente
+        '400':
+          description: Error al crear usuario
+  /login:
+    post:
+      tags:
+        - Authentication
+      summary: Inicio de sesión
+      description: Permite a un usuario iniciar sesión.
+      operationId: loginUser
+      security: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                username:
+                  type: string
+                password:
+                  type: string
+      responses:
+        '200':
+          description: Éxito al iniciar sesión
+        '400':
+          description: Error en los datos de inicio de sesión
+  /signup:
+    post:
+      tags:
+        - Authentication
+      summary: Registro de usuario
+      description: Permite a un nuevo usuario registrarse.
+      operationId: signupUser
+      security: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                username:
+                  type: string
+                password:
+                  type: string
+      responses:
+        '201':
+          description: Usuario creado con éxito
+        '400':
+          description: Error al crear usuario
+  /logout:
+    post:
+      tags:
+        - Authentication
+      summary: Cerrar sesión
+      description: Permite a un usuario cerrar sesión.
+      operationId: logoutUser
+      responses:
+        '200':
+          description: Éxito al cerrar sesión
+        '401':
+          description: No autorizado
+  /invited/shorten:
+    post:
+      summary: Shorten a URL link
+      description: >-
+        Accepts an original URL and generates a random short URL, which expires
+        24 hours after its creation.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                originalUrl:
+                  type: string
+                  description: The original URL to shorten.
+      responses:
+        '201':
+          description: Short URL generated successfully.
+        '400':
+          description: >-
+            The request could not be processed due to invalid or duplicated
+            input, missing parameters, or mismatched data.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    description: A detailed message about the error.
+                    example: >-
+                      The request could not be processed due to invalid input,
+                      missing parameters, or mismatched data.
+        '500':
+          description: An unexpected error occurred on the server. Please try again later.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    description: A detailed message about the error.
+                    example: >-
+                      An unexpected error occurred on the server. Please try
+                      again later.
+  '/{/:shortId}':
+    get:
+      summary: Redirigir a URL
+      description: Redirige a la URL original a partir de una URL corta.
+      operationId: urlRedirect
+      parameters:
+        - in: path
+          name: shortenedUrl
+          required: true
+          schema:
+            type: string
+      responses:
+        '302':
+          description: Redirección exitosa
+        '404':
+          description: Enlace no encontrado
+  '/user/{id}':
+    get:
+      tags:
+        - User
+      summary: >-
+        Retrieve detailed information for a specific user by their unique
+        identifier.
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: The ID of the user to retrieve
+          schema:
+            type: string
+            example: abc123
+      responses:
+        allOf:
+          - '200':
+              description: User successfully retrieved
+              content:
+                application/json:
+                  schema:
+                    allOf:
+                      - type: object
+                        properties:
+                          username:
+                            type: string
+                            description: The username of the user
+                            example: newUser123
+                          email:
+                            type: string
+                            format: email
+                            description: The email of the user
+                            example: newEmail@example.com
+                          isAdmin:
+                            type: boolean
+                            description: Indicates whether the user has admin privileges
+                            default: false
+                      - type: object
+                        properties:
+                          _id:
+                            type: string
+                            description: Unique identifier for the user
+                          urls:
+                            type: array
+                            items:
+                              type: string
+                              format: uuid
+                              description: >-
+                                Array of URLs associated with the user
+                                (references to other documents)
+                          createdAt:
+                            type: string
+                            format: date-time
+                            description: The date and time when the user was created
+                          updatedAt:
+                            type: string
+                            format: date-time
+                            description: The date and time when the user was last updated
+          - '400':
+              description: >-
+                The request could not be processed due to invalid or duplicated
+                input, missing parameters, or mismatched data.
+              content:
+                application/json:
+                  schema:
+                    type: object
+                    properties:
+                      message:
+                        type: string
+                        description: A detailed message about the error.
+                        example: >-
+                          The request could not be processed due to invalid
+                          input, missing parameters, or mismatched data.
+            '401':
+              description: >-
+                You are not authorized to access this resource. Please log in
+                and try again.
+              content:
+                application/json:
+                  schema:
+                    type: object
+                    properties:
+                      message:
+                        type: string
+                        description: A detailed message about the error.
+                        example: >-
+                          You are not authorized to access this resource. Please
+                          log in and try again.
+            '404':
+              description: >-
+                The requested resource could not be found. Please check the
+                provided data and try again.
+              content:
+                application/json:
+                  schema:
+                    type: object
+                    properties:
+                      message:
+                        type: string
+                        description: A detailed message about the error.
+                        example: >-
+                          The requested resource could not be found. Please
+                          check the provided data and try again.
+            '500':
+              description: >-
+                An unexpected error occurred on the server. Please try again
+                later.
+              content:
+                application/json:
+                  schema:
+                    type: object
+                    properties:
+                      message:
+                        type: string
+                        description: A detailed message about the error.
+                        example: >-
+                          An unexpected error occurred on the server. Please try
+                          again later.
+    put:
+      tags:
+        - User
+      summary: Update user information by ID
+      description: >-
+        Update the details of a specific user by their ID, without modifying the
+        password.
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: The ID of the user to retrieve
+          schema:
+            type: string
+            example: abc123
+      requestBody:
+        description: Datos para actualizar un usuario.
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                username:
+                  type: string
+                  description: The username of the user
+                  example: newUser123
+                email:
+                  type: string
+                  format: email
+                  description: The email of the user
+                  example: newEmail@example.com
+                isAdmin:
+                  type: boolean
+                  description: Indicates whether the user has admin privileges
+                  default: false
+      responses:
+        allOf:
+          - '200':
+              description: User updated successfully.
+              content:
+                application/json:
+                  schema:
+                    - type: object
+                      properties:
+                        username:
+                          type: string
+                          description: The username of the user
+                          example: newUser123
+                        email:
+                          type: string
+                          format: email
+                          description: The email of the user
+                          example: newEmail@example.com
+                        isAdmin:
+                          type: boolean
+                          description: Indicates whether the user has admin privileges
+                          default: false
+          - '400':
+              description: >-
+                The request could not be processed due to invalid or duplicated
+                input, missing parameters, or mismatched data.
+              content:
+                application/json:
+                  schema:
+                    type: object
+                    properties:
+                      message:
+                        type: string
+                        description: A detailed message about the error.
+                        example: >-
+                          The request could not be processed due to invalid
+                          input, missing parameters, or mismatched data.
+            '401':
+              description: >-
+                You are not authorized to access this resource. Please log in
+                and try again.
+              content:
+                application/json:
+                  schema:
+                    type: object
+                    properties:
+                      message:
+                        type: string
+                        description: A detailed message about the error.
+                        example: >-
+                          You are not authorized to access this resource. Please
+                          log in and try again.
+            '404':
+              description: >-
+                The requested resource could not be found. Please check the
+                provided data and try again.
+              content:
+                application/json:
+                  schema:
+                    type: object
+                    properties:
+                      message:
+                        type: string
+                        description: A detailed message about the error.
+                        example: >-
+                          The requested resource could not be found. Please
+                          check the provided data and try again.
+            '500':
+              description: >-
+                An unexpected error occurred on the server. Please try again
+                later.
+              content:
+                application/json:
+                  schema:
+                    type: object
+                    properties:
+                      message:
+                        type: string
+                        description: A detailed message about the error.
+                        example: >-
+                          An unexpected error occurred on the server. Please try
+                          again later.
+  '/user/{id}/password':
+    put:
+      tags:
+        - User
+      summary: Change a user's password
+      description: Change a user's password by providing the current and new passwords.
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: The ID of the user to retrieve
+          schema:
+            type: string
+            example: abc123
+      requestBody:
+        description: Datos para cambiar la contraseña de un usuario.
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                currentPassword:
+                  type: string
+                  description: Contraseña actual del usuario.
+                  example: '123456'
+                newPassword:
+                  type: string
+                  description: Nueva contraseña que desea establecer.
+                  example: newpassword123
+                confirmPassword:
+                  type: string
+                  description: Confirmación de la nueva contraseña.
+                  example: newpassword123
+              additionalProperties: false
+      responses:
+        allOf:
+          - '200':
+              description: password updated successfully.
+              content:
+                application/json:
+                  schema:
+                    type: object
+                    properties:
+                      message:
+                        type: string
+                        example: You have successfully updated your password.
+          - '400':
+              description: >-
+                The request could not be processed due to invalid or duplicated
+                input, missing parameters, or mismatched data.
+              content:
+                application/json:
+                  schema:
+                    type: object
+                    properties:
+                      message:
+                        type: string
+                        description: A detailed message about the error.
+                        example: >-
+                          The request could not be processed due to invalid
+                          input, missing parameters, or mismatched data.
+            '401':
+              description: >-
+                You are not authorized to access this resource. Please log in
+                and try again.
+              content:
+                application/json:
+                  schema:
+                    type: object
+                    properties:
+                      message:
+                        type: string
+                        description: A detailed message about the error.
+                        example: >-
+                          You are not authorized to access this resource. Please
+                          log in and try again.
+            '404':
+              description: >-
+                The requested resource could not be found. Please check the
+                provided data and try again.
+              content:
+                application/json:
+                  schema:
+                    type: object
+                    properties:
+                      message:
+                        type: string
+                        description: A detailed message about the error.
+                        example: >-
+                          The requested resource could not be found. Please
+                          check the provided data and try again.
+            '500':
+              description: >-
+                An unexpected error occurred on the server. Please try again
+                later.
+              content:
+                application/json:
+                  schema:
+                    type: object
+                    properties:
+                      message:
+                        type: string
+                        description: A detailed message about the error.
+                        example: >-
+                          An unexpected error occurred on the server. Please try
+                          again later.
+  '/user/{id}/request-deletion':
+    post:
+      tags:
+        - User
+      summary: Account deletion request
+      description: User requests an account deletion that will be completed within 24 hours
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: The ID of the user to retrieve
+          schema:
+            type: string
+            example: abc123
+      responses:
+        allOf:
+          - '200':
+              description: Request submitted successfully.
+              content:
+                application/json:
+                  schema:
+                    type: object
+                    properties:
+                      message:
+                        type: string
+                        example: Your account deletion will be completed in 24 hours.
+          - '400':
+              description: >-
+                The request could not be processed due to invalid or duplicated
+                input, missing parameters, or mismatched data.
+              content:
+                application/json:
+                  schema:
+                    type: object
+                    properties:
+                      message:
+                        type: string
+                        description: A detailed message about the error.
+                        example: >-
+                          The request could not be processed due to invalid
+                          input, missing parameters, or mismatched data.
+            '401':
+              description: >-
+                You are not authorized to access this resource. Please log in
+                and try again.
+              content:
+                application/json:
+                  schema:
+                    type: object
+                    properties:
+                      message:
+                        type: string
+                        description: A detailed message about the error.
+                        example: >-
+                          You are not authorized to access this resource. Please
+                          log in and try again.
+            '404':
+              description: >-
+                The requested resource could not be found. Please check the
+                provided data and try again.
+              content:
+                application/json:
+                  schema:
+                    type: object
+                    properties:
+                      message:
+                        type: string
+                        description: A detailed message about the error.
+                        example: >-
+                          The requested resource could not be found. Please
+                          check the provided data and try again.
+            '500':
+              description: >-
+                An unexpected error occurred on the server. Please try again
+                later.
+              content:
+                application/json:
+                  schema:
+                    type: object
+                    properties:
+                      message:
+                        type: string
+                        description: A detailed message about the error.
+                        example: >-
+                          An unexpected error occurred on the server. Please try
+                          again later.
+  '/user/{id}/cancel-deletion':
+    post:
+      tags:
+        - User
+      summary: Cancel account deletion.
+      description: Cancel account deletion (before the 24-hour period ends).
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: The ID of the user to retrieve
+          schema:
+            type: string
+            example: abc123
+      responses:
+        allOf:
+          - '200':
+              description: Request submitted successfully.
+              content:
+                application/json:
+                  schema:
+                    type: object
+                    properties:
+                      message:
+                        type: string
+                        example: >-
+                          Your account deletion has been canceled. Thank you for
+                          continuing to use our service.
+          - '400':
+              description: >-
+                The request could not be processed due to invalid or duplicated
+                input, missing parameters, or mismatched data.
+              content:
+                application/json:
+                  schema:
+                    type: object
+                    properties:
+                      message:
+                        type: string
+                        description: A detailed message about the error.
+                        example: >-
+                          The request could not be processed due to invalid
+                          input, missing parameters, or mismatched data.
+            '401':
+              description: >-
+                You are not authorized to access this resource. Please log in
+                and try again.
+              content:
+                application/json:
+                  schema:
+                    type: object
+                    properties:
+                      message:
+                        type: string
+                        description: A detailed message about the error.
+                        example: >-
+                          You are not authorized to access this resource. Please
+                          log in and try again.
+            '404':
+              description: >-
+                The requested resource could not be found. Please check the
+                provided data and try again.
+              content:
+                application/json:
+                  schema:
+                    type: object
+                    properties:
+                      message:
+                        type: string
+                        description: A detailed message about the error.
+                        example: >-
+                          The requested resource could not be found. Please
+                          check the provided data and try again.
+            '500':
+              description: >-
+                An unexpected error occurred on the server. Please try again
+                later.
+              content:
+                application/json:
+                  schema:
+                    type: object
+                    properties:
+                      message:
+                        type: string
+                        description: A detailed message about the error.
+                        example: >-
+                          An unexpected error occurred on the server. Please try
+                          again later.
+  '/user/{id}/urls/shorten':
+    post:
+      tags:
+        - URLs
+      summary: Shorten a URL for a user.
+      description: Shorten a URL for a users
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: The ID of the user to retrieve
+          schema:
+            type: string
+            example: abc123
+      requestBody:
+        description: Original URL and Custom ID
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                originalUrl:
+                  type: string
+                  description: Original URL.
+                  example: 'https://example.com'
+                shortId:
+                  type: string
+                  description: Custom url ID.
+                  example: CustomID
+                user:
+                  type: string
+                  description: ID of the user who owns the URL (MongoDB ObjectId).
+                  example: 60d5f3a0f8d2e87d8f0f8c9b
+                  nullable: true
+              required:
+                - originalUrl
+                - shortId
+              additionalProperties: false
+      responses:
+        allOf:
+          - '201':
+              description: URL shortened successfully
+              content:
+                application/json:
+                  schema:
+                    type: object
+                    properties:
+                      originalUrl:
+                        type: string
+                        description: Original URL.
+                        example: 'https://example.com'
+                      shortId:
+                        type: string
+                        description: Custom url ID.
+                        example: CustomID
+                      user:
+                        type: string
+                        description: ID of the user who owns the URL (MongoDB ObjectId).
+                        example: 60d5f3a0f8d2e87d8f0f8c9b
+                        nullable: true
+                    required:
+                      - originalUrl
+                      - shortId
+                    additionalProperties: false
+          - '400':
+              description: >-
+                The request could not be processed due to invalid or duplicated
+                input, missing parameters, or mismatched data.
+              content:
+                application/json:
+                  schema:
+                    type: object
+                    properties:
+                      message:
+                        type: string
+                        description: A detailed message about the error.
+                        example: >-
+                          The request could not be processed due to invalid
+                          input, missing parameters, or mismatched data.
+            '401':
+              description: >-
+                You are not authorized to access this resource. Please log in
+                and try again.
+              content:
+                application/json:
+                  schema:
+                    type: object
+                    properties:
+                      message:
+                        type: string
+                        description: A detailed message about the error.
+                        example: >-
+                          You are not authorized to access this resource. Please
+                          log in and try again.
+            '404':
+              description: >-
+                The requested resource could not be found. Please check the
+                provided data and try again.
+              content:
+                application/json:
+                  schema:
+                    type: object
+                    properties:
+                      message:
+                        type: string
+                        description: A detailed message about the error.
+                        example: >-
+                          The requested resource could not be found. Please
+                          check the provided data and try again.
+            '500':
+              description: >-
+                An unexpected error occurred on the server. Please try again
+                later.
+              content:
+                application/json:
+                  schema:
+                    type: object
+                    properties:
+                      message:
+                        type: string
+                        description: A detailed message about the error.
+                        example: >-
+                          An unexpected error occurred on the server. Please try
+                          again later.
+  '/user/{id}/urls/delete':
+    delete:
+      tags:
+        - URLs
+      summary: Delete one or more URLs from a user's account.
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: The ID of the user to retrieve
+          schema:
+            type: string
+            example: abc123
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                shortIds:
+                  type: array
+                  items:
+                    type: string
+                  description: An array of short IDs representing the URLs to delete.
+              required:
+                - shortIds
+      responses:
+        allOf:
+          - '200':
+              description: URLs deletion was successfull.
+              content:
+                application/json:
+                  schema:
+                    type: object
+                    properties:
+                      message:
+                        type: string
+                        example: 3 URLs deleted successfully
+          - '400':
+              description: >-
+                The request could not be processed due to invalid or duplicated
+                input, missing parameters, or mismatched data.
+              content:
+                application/json:
+                  schema:
+                    type: object
+                    properties:
+                      message:
+                        type: string
+                        description: A detailed message about the error.
+                        example: >-
+                          The request could not be processed due to invalid
+                          input, missing parameters, or mismatched data.
+            '401':
+              description: >-
+                You are not authorized to access this resource. Please log in
+                and try again.
+              content:
+                application/json:
+                  schema:
+                    type: object
+                    properties:
+                      message:
+                        type: string
+                        description: A detailed message about the error.
+                        example: >-
+                          You are not authorized to access this resource. Please
+                          log in and try again.
+            '404':
+              description: >-
+                The requested resource could not be found. Please check the
+                provided data and try again.
+              content:
+                application/json:
+                  schema:
+                    type: object
+                    properties:
+                      message:
+                        type: string
+                        description: A detailed message about the error.
+                        example: >-
+                          The requested resource could not be found. Please
+                          check the provided data and try again.
+            '500':
+              description: >-
+                An unexpected error occurred on the server. Please try again
+                later.
+              content:
+                application/json:
+                  schema:
+                    type: object
+                    properties:
+                      message:
+                        type: string
+                        description: A detailed message about the error.
+                        example: >-
+                          An unexpected error occurred on the server. Please try
+                          again later.
+  '/user/{id}/stats':
+    get:
+      summary: Get general statistics for the user's URLs
+      description: >-
+        Returns the statistics of the user's URLs, including total clicks per
+        URL.
+      tags:
+        - Stats
+      parameters:
+        allOf:
+          - name: id
+            in: path
+            required: true
+            description: The ID of the user to retrieve
+            schema:
+              type: string
+              example: abc123
+          - name: page
+            in: query
+            description: Page number for pagination (default is 1)
+            required: false
+            schema:
+              type: integer
+              example: 1
+          - name: limit
+            in: query
+            description: Results per page (default is 10)
+            required: false
+            schema:
+              type: integer
+              example: 10
+      responses:
+        allOf:
+          - '200':
+              description: Statistics fetched successfully.
+              content:
+                application/json:
+                  schema:
+                    type: object
+                    properties:
+                      stats:
+                        type: array
+                        items:
+                          type: object
+                          properties:
+                            shortLink:
+                              type: string
+                              example: abc123
+                            originalUrl:
+                              type: string
+                              example: 'https://www.example.com'
+                            totalClicks:
+                              type: integer
+                              example: 123
+                      pagination:
+                        type: object
+                        properties:
+                          totalUrls:
+                            type: integer
+                            example: 50
+                            description: >-
+                              Total number of URLs for the user (calculated
+                              dynamically)
+                          totalPages:
+                            type: integer
+                            example: 5
+                            description: >-
+                              Total number of pages for pagination (calculated
+                              dynamically)
+                          currentPage:
+                            type: integer
+                            example: 1
+                            description: Current page number (provided by the user)
+                          limit:
+                            type: integer
+                            example: 10
+                            description: Limit of results per page (provided by the user)
+          - '400':
+              description: >-
+                The request could not be processed due to invalid or duplicated
+                input, missing parameters, or mismatched data.
+              content:
+                application/json:
+                  schema:
+                    type: object
+                    properties:
+                      message:
+                        type: string
+                        description: A detailed message about the error.
+                        example: >-
+                          The request could not be processed due to invalid
+                          input, missing parameters, or mismatched data.
+            '401':
+              description: >-
+                You are not authorized to access this resource. Please log in
+                and try again.
+              content:
+                application/json:
+                  schema:
+                    type: object
+                    properties:
+                      message:
+                        type: string
+                        description: A detailed message about the error.
+                        example: >-
+                          You are not authorized to access this resource. Please
+                          log in and try again.
+            '404':
+              description: >-
+                The requested resource could not be found. Please check the
+                provided data and try again.
+              content:
+                application/json:
+                  schema:
+                    type: object
+                    properties:
+                      message:
+                        type: string
+                        description: A detailed message about the error.
+                        example: >-
+                          The requested resource could not be found. Please
+                          check the provided data and try again.
+            '500':
+              description: >-
+                An unexpected error occurred on the server. Please try again
+                later.
+              content:
+                application/json:
+                  schema:
+                    type: object
+                    properties:
+                      message:
+                        type: string
+                        description: A detailed message about the error.
+                        example: >-
+                          An unexpected error occurred on the server. Please try
+                          again later.
+  '/user/{id}/stats/{shortId}':
+    get:
+      summary: Get statistics for a specific URL
+      description: >-
+        Returns the statistics of a specific URL by its shortId, including total
+        clicks, device types, and locations.
+      tags:
+        - Stats
+      parameters:
+        allOf:
+          - name: id
+            in: path
+            required: true
+            description: The ID of the user to retrieve
+            schema:
+              type: string
+              example: abc123
+          - name: shortId
+            in: path
+            description: Short ID of the URL
+            required: true
+            schema:
+              type: string
+              example: abc123short
+      responses:
+        allOf:
+          - '200':
+              description: Statistics fetched successfully.
+              content:
+                application/json:
+                  schema:
+                    allOf:
+                      - type: object
+                        properties:
+                          shortLink:
+                            type: string
+                            example: abc123
+                          originalUrl:
+                            type: string
+                            example: 'https://www.example.com'
+                          totalClicks:
+                            type: integer
+                            example: 123
+                      - type: object
+                        properties:
+                          detailedClicks:
+                            type: object
+                            properties:
+                              locationsCount:
+                                type: object
+                                additionalProperties:
+                                  type: integer
+                                example:
+                                  USA: 100
+                                  Canada: 23
+                              mobileClicks:
+                                type: integer
+                                example: 85
+                              desktopClicks:
+                                type: integer
+                                example: 38
+          - '400':
+              description: >-
+                The request could not be processed due to invalid or duplicated
+                input, missing parameters, or mismatched data.
+              content:
+                application/json:
+                  schema:
+                    type: object
+                    properties:
+                      message:
+                        type: string
+                        description: A detailed message about the error.
+                        example: >-
+                          The request could not be processed due to invalid
+                          input, missing parameters, or mismatched data.
+            '401':
+              description: >-
+                You are not authorized to access this resource. Please log in
+                and try again.
+              content:
+                application/json:
+                  schema:
+                    type: object
+                    properties:
+                      message:
+                        type: string
+                        description: A detailed message about the error.
+                        example: >-
+                          You are not authorized to access this resource. Please
+                          log in and try again.
+            '404':
+              description: >-
+                The requested resource could not be found. Please check the
+                provided data and try again.
+              content:
+                application/json:
+                  schema:
+                    type: object
+                    properties:
+                      message:
+                        type: string
+                        description: A detailed message about the error.
+                        example: >-
+                          The requested resource could not be found. Please
+                          check the provided data and try again.
+            '500':
+              description: >-
+                An unexpected error occurred on the server. Please try again
+                later.
+              content:
+                application/json:
+                  schema:
+                    type: object
+                    properties:
+                      message:
+                        type: string
+                        description: A detailed message about the error.
+                        example: >-
+                          An unexpected error occurred on the server. Please try
+                          again later.
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+

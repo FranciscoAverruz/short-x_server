@@ -1,0 +1,60 @@
+  /login:
+    post:
+      tags:
+        - Authentication
+      summary: "Inicio de sesión"
+      description: "Permite a un usuario iniciar sesión."
+      operationId: loginUser
+      security: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                username:
+                  type: string
+                password:
+                  type: string
+      responses:
+        '200':
+          description: "Éxito al iniciar sesión"
+        '400':
+          description: "Error en los datos de inicio de sesión"
+
+  /signup:
+    post:
+      tags:
+        - Authentication
+      summary: "Registro de usuario"
+      description: "Permite a un nuevo usuario registrarse."
+      operationId: signupUser
+      security: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                username:
+                  type: string
+                password:
+                  type: string
+      responses:
+        '201':
+          description: "Usuario creado con éxito"
+        '400':
+          description: "Error al crear usuario"
+
+  /logout:
+    post:
+      tags:
+        - Authentication
+      summary: "Cerrar sesión"
+      description: "Permite a un usuario cerrar sesión."
+      operationId: logoutUser
+      responses:
+        '200':
+          description: "Éxito al cerrar sesión"
+        '401':
+          description: "No autorizado"

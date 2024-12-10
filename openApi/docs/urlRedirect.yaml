@@ -1,0 +1,16 @@
+  /{/:shortId}:
+    get:
+      summary: "Redirigir a URL"
+      description: "Redirige a la URL original a partir de una URL corta."
+      operationId: urlRedirect
+      parameters:
+        - in: path
+          name: shortenedUrl
+          required: true
+          schema:
+            type: string
+      responses:
+        '302':
+          description: "Redirección exitosa"
+        '404':
+          description: "Enlace no encontrado"

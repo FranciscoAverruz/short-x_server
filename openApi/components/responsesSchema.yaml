@@ -1,0 +1,31 @@
+    Error400:
+      type: object
+      properties:
+        message:
+          type: string
+          description: "A detailed message about the error."
+          example: "The request could not be processed due to invalid input, missing parameters, or mismatched data."
+
+    Error401:
+      type: object
+      properties:
+        message:
+          type: string
+          description: "A detailed message about the error."
+          example: "You are not authorized to access this resource. Please log in and try again."
+  
+    Error404:
+      type: object
+      properties:
+        message:
+          type: string
+          description: "A detailed message about the error."
+          example: "The requested resource could not be found. Please check the provided data and try again."
+
+    Error500:
+      type: object
+      properties:
+        message:
+          type: string
+          description: "A detailed message about the error."
+          example: "An unexpected error occurred on the server. Please try again later."
