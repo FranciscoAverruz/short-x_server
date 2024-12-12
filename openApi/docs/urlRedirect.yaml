@@ -1,4 +1,4 @@
-  /{/:shortId}:
+  /{shortId}:
     get:
       summary: "Redirigir a URL"
       description: "Redirige a la URL original a partir de una URL corta."

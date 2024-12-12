@@ -3,14 +3,20 @@ const bcrypt = require("bcryptjs");
 const jwt = require ("jsonwebtoken");
 
 const UserSchema = new mongoose.Schema({
-  username: { type: String, required: true },
-  email: { type: String, required: true, unique: true },
-  password: { type: String, required: true },
-  isAdmin: { type: Boolean, default: false },
-  urls: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Url' }],
-}, {
-  timestamps:true
-});
+    username: { type: String, required: true },
+    email: { type: String, required: true, unique: true },
+    password: { type: String, required: true },
+    isAdmin: { type: Boolean, default: false },
+    urls: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Url' }],
+    // Nuevos campos para manejar la eliminación programada
+    scheduledForDeletion: { type: Date, default: null }, // Fecha en que la cuenta debe ser eliminada
+    isCancellationPending: { type: Boolean, default: false }, // Si la eliminación está pendiente de cancelación
+    cancellationRequestedAt: { type: Date, default: null }, // Fecha en la que se solicitó la cancelación
+  },
+  {
+    timestamps: true, // Esto agrega createdAt y updatedAt automáticamente
+  }
+);
 
 UserSchema.statics.signup = async function (username, email, isAdmin, urls, password) {
 

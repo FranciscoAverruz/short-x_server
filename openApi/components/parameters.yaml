@@ -7,7 +7,7 @@
       type: string
       example: "abc123" 
 
-  Page:
+  page:
     name: page
     in: query
     description: "Page number for pagination (default is 1)"
@@ -16,7 +16,7 @@
       type: integer
       example: 1
 
-  Limit:
+  limit:
     name: limit
     in: query
     description: "Results per page (default is 10)"

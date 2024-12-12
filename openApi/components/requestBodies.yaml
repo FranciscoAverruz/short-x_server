@@ -1,12 +1,22 @@
-    UserUpdate:
+    createUser:
       description: "Datos para actualizar un usuario."
       required: true
       content:
         application/json:
           schema:
-            $ref: './schemas.yaml#/User'
+            allOf:
+            - $ref: './schemas.yaml#/user'
+            - $ref: './schemas.yaml#/userCreate'
 
-    PasswordChange:
+    userUpdate:
+      description: "Datos para actualizar un usuario."
+      required: true
+      content:
+        application/json:
+          schema:
+            $ref: './schemas.yaml#/user'
+
+    passwordChange:
       description: "Datos para cambiar la contraseña de un usuario."
       required: true
       content:
@@ -28,10 +38,26 @@
                 example: "newpassword123"
             additionalProperties: false
 
-    URLS:
+    URLs:
       description: "Original URL and Custom ID"
       content:
         application/json:
           schema:
-            $ref: './schemas.yaml#/URLS'
-            
+            $ref: './schemas.yaml#/URLs'
+
+    requestCancelation:
+      required: true
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              deletionTimeInHours:
+                type: integer
+                description:  >
+                    The number of hours until the account is deleted.  
+                    - If 0 or omitted, the deletion is immediate (for admins).  
+                    - Must be a positive number to schedule a future deletion.
+                example: 48
+            required:
+              - deletionTimeInHours

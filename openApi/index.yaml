@@ -1,7 +1,52 @@
+  /admin-user/{id}:
+    get:
+      tags:
+        - Administration
+      summary: "Get user details by ID."
+      description: "Retrieve detailed information for a specific user by their unique identifier."
+      allOf:
+        - $ref: './components/userDetails.yaml#/getOneUser'
 
-  # Obtener todos los usuarios
+    put:
+      tags:
+        - Administration
+      summary: "Update user information by ID"
+      description: "Update the details of a specific user by their ID, without modifying the password."
+      allOf:
+        - $ref: './components/userDetails.yaml#/updateUser'        
+
+  /admin-user/{id}/password:
+    put:
+      tags:
+        - Administration
+      summary: "Change a user's password"
+      description: "Change a user's password by providing the current and new passwords."
+      allOf:     
+        - $ref: './components/userDetails.yaml#/changePassword'
+  
+  /admin-user/{id}/request-deletion:
+    post:
+      tags:
+        - Administration
+      summary: "Account deletion request"
+      description: > 
+        Allows a user to request their account deletion.
+        - **Administrators** can delete the account immediately or schedule it for deletion by specifying `deletionTimeInHours`.
+      allOf:
+        - $ref: './components/userDetails.yaml#/accountDeletion'
+  
+  /admin-user/{id}/cancel-deletion:
+    post:
+      tags:
+        - Administration
+      summary: "Cancel account deletion."
+      description: "Cancel account deletion (before the 24-hour period ends)."
+      allOf:
+        - $ref: './components/userDetails.yaml#/cancelDeletion'
   /admin/all-users:
     get:
+      tags:
+        - Administration
       summary: "Obtener todos los usuarios"
       description: "Devuelve una lista de todos los usuarios registrados."
       operationId: retUsersAll
@@ -14,19 +59,22 @@
   # Crear nuevo usuario (reutiliza ruta de user.yaml)
   /admin:
     post:
+      tags:
+        - Administration
       summary: "Crear nuevo usuario"
       description: "Crea un nuevo usuario en el sistema."
       operationId: createUser
       requestBody:
-        content:
-          application/json:
-            schema:
-              type: object
-              properties:
-                username:
-                  type: string
-                password:
-                  type: string
+        $ref: './components/requestBodies.yaml#/createUser'
+        # content:
+        #   application/json:
+        #     schema:
+        #       type: object
+        #       properties:
+        #         username:
+        #           type: string
+        #         password:
+        #           type: string
       responses:
         '201':
           description: "Usuario creado exitosamente"
@@ -93,8 +141,42 @@
         '401':
           description: "No autorizado"
 
+  /admin-user/{id}/stats:
+    get:
+      tags:
+        - Stats
+      summary: "Get general statistics for the user's URLs"
+      description: "Returns the statistics of the user's URLs, including total clicks per URL."
+      allOf: 
+        - $ref: './components/userDetails.yaml#/userStatistics'
 
-  /invited/shorten:
+  /admin-user/{id}/stats/{shortId}:
+    get:
+      tags:
+        - Stats
+      summary: "Get statistics for a specific URL"
+      description: "Returns the statistics of a specific URL by its shortId, including total clicks, device types, and locations."
+      allOf:
+        - $ref: './components/userDetails.yaml#/urlStatistic'
+
+  /user/{id}/stats:
+    get:
+      tags:
+        - Stats
+      summary: "Get general statistics for the user's URLs"
+      description: "Returns the statistics of the user's URLs, including total clicks per URL."
+      allOf: 
+        - $ref: './components/userDetails.yaml#/userStatistics'
+
+  /user/{id}/stats/{shortId}:
+    get:
+      tags:
+        - Stats
+      summary: "Get statistics for a specific URL"
+      description: "Returns the statistics of a specific URL by its shortId, including total clicks, device types, and locations."
+      allOf:
+        - $ref: './components/userDetails.yaml#/urlStatistic'
+  /invited/shortenId:
     post:
       summary: "Shorten a URL link"
       description: "Accepts an original URL and generates a random short URL, which expires 24 hours after its creation."
@@ -103,15 +185,15 @@
         content:
           application/json:
             schema:
-              $ref: './components/schemas.yaml#/InvitedPost'
+              $ref: './components/schemas.yaml#/invitedPost'
       responses:
         201:
           description: Short URL generated successfully.
         400:
-          $ref: './components/responses.yaml#/BadRequest'
+          $ref: './components/responses.yaml#/badRequest'
         500:
-          $ref: './components/responses.yaml#/ServerError'
-  /{/:shortId}:
+          $ref: './components/responses.yaml#/serverError'
+  /{shortId}:
     get:
       summary: "Redirigir a URL"
       description: "Redirige a la URL original a partir de una URL corta."
@@ -128,31 +210,34 @@
         '404':
           description: "Enlace no encontrado"
 
+  /admin-user/{id}/urls/shorten:
+    $ref: './components/urlUsersComponent.yaml#/shorten'
+
+  /user/{id}/urls/shorten:
+    $ref: './components/urlUsersComponent.yaml#/shorten'
+
+  /admin-user/{id}/urls/delete:
+    $ref: './components/urlUsersComponent.yaml#/deletion'
+
+  /user/{id}/urls/delete:
+    $ref: './components/urlUsersComponent.yaml#/deletion'
+
   /user/{id}:
     get:
       tags:
         - User
-      summary: "Retrieve detailed information for a specific user by their unique identifier."
-      parameters:
-        - $ref: './components/parameters.yaml#/userIdParam'
-      responses:
-        allOf:
-          - $ref: './components/responses.yaml#/UserFound'
-          - $ref: './components/responses.yaml#/CommonErrors'
+      summary: "Get user details by ID."
+      description: "Retrieve detailed information for a specific user by their unique identifier."
+      allOf:
+        - $ref: './components/userDetails.yaml#/getOneUser'
 
     put:
       tags:
         - User
       summary: "Update user information by ID"
       description: "Update the details of a specific user by their ID, without modifying the password."
-      parameters:
-        - $ref: './components/parameters.yaml#/userIdParam'
-      requestBody:
-        $ref: './components/requestBodies.yaml#/UserUpdate'
-      responses:
-        allOf:
-          - $ref: './components/responses.yaml#/UpdatedUser'
-          - $ref: './components/responses.yaml#/CommonErrors'
+      allOf:
+        - $ref: './components/userDetails.yaml#/updateUser'
 
   /user/{id}/password:
     put:
@@ -160,27 +245,19 @@
         - User
       summary: "Change a user's password"
       description: "Change a user's password by providing the current and new passwords."
-      parameters:
-        - $ref: './components/parameters.yaml#/userIdParam'
-      requestBody:
-        $ref: './components/requestBodies.yaml#/PasswordChange'
-      responses:
-        allOf:
-          - $ref: './components/responses.yaml#/UpdatedPassword'
-          - $ref: './components/responses.yaml#/CommonErrors'
+      allOf:     
+        - $ref: './components/userDetails.yaml#/changePassword'
   
   /user/{id}/request-deletion:
     post:
       tags:
         - User
       summary: "Account deletion request"
-      description: "User requests an account deletion that will be completed within 24 hours"
-      parameters:
-        - $ref: './components/parameters.yaml#/userIdParam'
-      responses:
-        allOf:
-          - $ref: './components/responses.yaml#/DelRequest'
-          - $ref: './components/responses.yaml#/CommonErrors'
+      description: > 
+        Allows a user to request their account deletion.
+        - **Regular users** can only schedule their own account for deletion (default is 24 hours).
+      allOf:
+        - $ref: './components/userDetails.yaml#/accountDeletion'
   
   /user/{id}/cancel-deletion:
     post:
@@ -188,88 +265,5 @@
         - User
       summary: "Cancel account deletion."
       description: "Cancel account deletion (before the 24-hour period ends)."
-      parameters:
-        - $ref: './components/parameters.yaml#/userIdParam'
-      responses:
-        allOf:
-          - $ref: './components/responses.yaml#/CancelRequest'
-          - $ref: './components/responses.yaml#/CommonErrors'
-
-  /user/{id}/urls/shorten:
-    post:
-      tags:
-        - URLs
-      summary: "Shorten a URL for a user."
-      description: "Shorten a URL for a users"
-      parameters:
-        - $ref: './components/parameters.yaml#/userIdParam'
-      requestBody:
-        $ref: './components/requestBodies.yaml#/URLS'
-      responses:
-        allOf:
-          - $ref: './components/responses.yaml#/NewURL'
-          - $ref: './components/responses.yaml#/CommonErrors'
-
-  /user/{id}/urls/delete:
-    delete:
-      tags:
-        - URLs
-      summary: "Delete one or more URLs from a user's account."
-      parameters:
-        - $ref: './components/parameters.yaml#/userIdParam'
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              type: object
-              properties:
-                shortIds:
-                  type: array
-                  items:
-                    type: string
-                  description: An array of short IDs representing the URLs to delete.
-              required:
-                - shortIds
-      responses:
-        allOf:
-          - $ref: './components/responses.yaml#/URLDeletion'
-          - $ref: './components/responses.yaml#/CommonErrors'
-
-  /user/{id}/stats:
-    get:
-      summary: "Get general statistics for the user's URLs"
-      description: "Returns the statistics of the user's URLs, including total clicks per URL."
-      tags:
-        - "Stats"
-      parameters:
-        allOf:
-          - $ref: './components/parameters.yaml#/userIdParam'
-          - $ref: './components/parameters.yaml#/Page'
-          - $ref: './components/parameters.yaml#/Limit'
-      responses:
-        allOf:
-          - $ref: './components/responses.yaml#/UserStats'
-          - $ref: './components/responses.yaml#/CommonErrors'
-
-  /user/{id}/stats/{shortId}:
-    get:
-      summary: "Get statistics for a specific URL"
-      description: "Returns the statistics of a specific URL by its shortId, including total clicks, device types, and locations."
-      tags:
-        - "Stats"
-      parameters:
-        allOf:
-          - $ref: './components/parameters.yaml#/userIdParam'
-          - name: shortId
-            in: path
-            description: "Short ID of the URL"
-            required: true
-            schema:
-              type: string
-              example: "abc123short"
-      responses:
-        allOf:
-          - $ref: './components/responses.yaml#/UrlStats'
-          - $ref: './components/responses.yaml#/CommonErrors'
-
+      allOf:
+        - $ref: './components/userDetails.yaml#/cancelDeletion'

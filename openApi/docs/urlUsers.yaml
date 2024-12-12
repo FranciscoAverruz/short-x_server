@@ -1,0 +1,11 @@
+  /admin-user/{id}/urls/shorten:
+    $ref: './components/urlUsersComponent.yaml#/shorten'
+
+  /user/{id}/urls/shorten:
+    $ref: './components/urlUsersComponent.yaml#/shorten'
+
+  /admin-user/{id}/urls/delete:
+    $ref: './components/urlUsersComponent.yaml#/deletion'
+
+  /user/{id}/urls/delete:
+    $ref: './components/urlUsersComponent.yaml#/deletion'

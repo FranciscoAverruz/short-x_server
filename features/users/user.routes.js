@@ -1,8 +1,9 @@
 const express = require('express')
 const router = express.Router()
 
-const { retUserById, updateUser, changePassword } = require('../users/user.controller.js')
-const { requestAccountDeletion, cancelAccountDeletion } = require('./deleteUser.controller.js');
+const { retUserById, updateUser, changePassword } = require('./user.controller.js')
+const { cancelAccountDeletion } = require('./deleteUserAccount.controller.js');
+const { requestAccountDeletion } = require('./deletionRequest.controller.js');
 const urlUser = require('../urls/urlForUser.routes.js');
 const statsRoutes = require('../stats/stats.routes.js');
 

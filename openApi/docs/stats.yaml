@@ -1,0 +1,35 @@
+  /admin-user/{id}/stats:
+    get:
+      tags:
+        - Stats
+      summary: "Get general statistics for the user's URLs"
+      description: "Returns the statistics of the user's URLs, including total clicks per URL."
+      allOf: 
+        - $ref: './components/userDetails.yaml#/userStatistics'
+
+  /admin-user/{id}/stats/{shortId}:
+    get:
+      tags:
+        - Stats
+      summary: "Get statistics for a specific URL"
+      description: "Returns the statistics of a specific URL by its shortId, including total clicks, device types, and locations."
+      allOf:
+        - $ref: './components/userDetails.yaml#/urlStatistic'
+
+  /user/{id}/stats:
+    get:
+      tags:
+        - Stats
+      summary: "Get general statistics for the user's URLs"
+      description: "Returns the statistics of the user's URLs, including total clicks per URL."
+      allOf: 
+        - $ref: './components/userDetails.yaml#/userStatistics'
+
+  /user/{id}/stats/{shortId}:
+    get:
+      tags:
+        - Stats
+      summary: "Get statistics for a specific URL"
+      description: "Returns the statistics of a specific URL by its shortId, including total clicks, device types, and locations."
+      allOf:
+        - $ref: './components/userDetails.yaml#/urlStatistic'

@@ -1,6 +1,7 @@
-  # Obtener todos los usuarios
   /admin/all-users:
     get:
+      tags:
+        - Administration
       summary: "Obtener todos los usuarios"
       description: "Devuelve una lista de todos los usuarios registrados."
       operationId: retUsersAll
@@ -13,19 +14,22 @@
   # Crear nuevo usuario (reutiliza ruta de user.yaml)
   /admin:
     post:
+      tags:
+        - Administration
       summary: "Crear nuevo usuario"
       description: "Crea un nuevo usuario en el sistema."
       operationId: createUser
       requestBody:
-        content:
-          application/json:
-            schema:
-              type: object
-              properties:
-                username:
-                  type: string
-                password:
-                  type: string
+        $ref: './components/requestBodies.yaml#/createUser'
+        # content:
+        #   application/json:
+        #     schema:
+        #       type: object
+        #       properties:
+        #         username:
+        #           type: string
+        #         password:
+        #           type: string
       responses:
         '201':
           description: "Usuario creado exitosamente"

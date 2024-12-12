@@ -2,27 +2,18 @@
     get:
       tags:
         - User
-      summary: "Retrieve detailed information for a specific user by their unique identifier."
-      parameters:
-        - $ref: './components/parameters.yaml#/userIdParam'
-      responses:
-        allOf:
-          - $ref: './components/responses.yaml#/UserFound'
-          - $ref: './components/responses.yaml#/CommonErrors'
+      summary: "Get user details by ID."
+      description: "Retrieve detailed information for a specific user by their unique identifier."
+      allOf:
+        - $ref: './components/userDetails.yaml#/getOneUser'
 
     put:
       tags:
         - User
       summary: "Update user information by ID"
       description: "Update the details of a specific user by their ID, without modifying the password."
-      parameters:
-        - $ref: './components/parameters.yaml#/userIdParam'
-      requestBody:
-        $ref: './components/requestBodies.yaml#/UserUpdate'
-      responses:
-        allOf:
-          - $ref: './components/responses.yaml#/UpdatedUser'
-          - $ref: './components/responses.yaml#/CommonErrors'
+      allOf:
+        - $ref: './components/userDetails.yaml#/updateUser'
 
   /user/{id}/password:
     put:
@@ -30,27 +21,19 @@
         - User
       summary: "Change a user's password"
       description: "Change a user's password by providing the current and new passwords."
-      parameters:
-        - $ref: './components/parameters.yaml#/userIdParam'
-      requestBody:
-        $ref: './components/requestBodies.yaml#/PasswordChange'
-      responses:
-        allOf:
-          - $ref: './components/responses.yaml#/UpdatedPassword'
-          - $ref: './components/responses.yaml#/CommonErrors'
+      allOf:     
+        - $ref: './components/userDetails.yaml#/changePassword'
   
   /user/{id}/request-deletion:
     post:
       tags:
         - User
       summary: "Account deletion request"
-      description: "User requests an account deletion that will be completed within 24 hours"
-      parameters:
-        - $ref: './components/parameters.yaml#/userIdParam'
-      responses:
-        allOf:
-          - $ref: './components/responses.yaml#/DelRequest'
-          - $ref: './components/responses.yaml#/CommonErrors'
+      description: > 
+        Allows a user to request their account deletion.
+        - **Regular users** can only schedule their own account for deletion (default is 24 hours).
+      allOf:
+        - $ref: './components/userDetails.yaml#/accountDeletion'
   
   /user/{id}/cancel-deletion:
     post:
@@ -58,87 +41,5 @@
         - User
       summary: "Cancel account deletion."
       description: "Cancel account deletion (before the 24-hour period ends)."
-      parameters:
-        - $ref: './components/parameters.yaml#/userIdParam'
-      responses:
-        allOf:
-          - $ref: './components/responses.yaml#/CancelRequest'
-          - $ref: './components/responses.yaml#/CommonErrors'
-
-  /user/{id}/urls/shorten:
-    post:
-      tags:
-        - URLs
-      summary: "Shorten a URL for a user."
-      description: "Shorten a URL for a users"
-      parameters:
-        - $ref: './components/parameters.yaml#/userIdParam'
-      requestBody:
-        $ref: './components/requestBodies.yaml#/URLS'
-      responses:
-        allOf:
-          - $ref: './components/responses.yaml#/NewURL'
-          - $ref: './components/responses.yaml#/CommonErrors'
-
-  /user/{id}/urls/delete:
-    delete:
-      tags:
-        - URLs
-      summary: "Delete one or more URLs from a user's account."
-      parameters:
-        - $ref: './components/parameters.yaml#/userIdParam'
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              type: object
-              properties:
-                shortIds:
-                  type: array
-                  items:
-                    type: string
-                  description: An array of short IDs representing the URLs to delete.
-              required:
-                - shortIds
-      responses:
-        allOf:
-          - $ref: './components/responses.yaml#/URLDeletion'
-          - $ref: './components/responses.yaml#/CommonErrors'
-
-  /user/{id}/stats:
-    get:
-      summary: "Get general statistics for the user's URLs"
-      description: "Returns the statistics of the user's URLs, including total clicks per URL."
-      tags:
-        - "Stats"
-      parameters:
-        allOf:
-          - $ref: './components/parameters.yaml#/userIdParam'
-          - $ref: './components/parameters.yaml#/Page'
-          - $ref: './components/parameters.yaml#/Limit'
-      responses:
-        allOf:
-          - $ref: './components/responses.yaml#/UserStats'
-          - $ref: './components/responses.yaml#/CommonErrors'
-
-  /user/{id}/stats/{shortId}:
-    get:
-      summary: "Get statistics for a specific URL"
-      description: "Returns the statistics of a specific URL by its shortId, including total clicks, device types, and locations."
-      tags:
-        - "Stats"
-      parameters:
-        allOf:
-          - $ref: './components/parameters.yaml#/userIdParam'
-          - name: shortId
-            in: path
-            description: "Short ID of the URL"
-            required: true
-            schema:
-              type: string
-              example: "abc123short"
-      responses:
-        allOf:
-          - $ref: './components/responses.yaml#/UrlStats'
-          - $ref: './components/responses.yaml#/CommonErrors'
+      allOf:
+        - $ref: './components/userDetails.yaml#/cancelDeletion'

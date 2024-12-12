@@ -2,7 +2,6 @@ name: Tarea programada de eliminación de cuentas
 
 on:
   schedule:
-    # Esto ejecutará el workflow todos los días a medianoche UTC
     - cron: '0 0 * * *'
 
 jobs:
@@ -15,8 +14,14 @@ jobs:
 
       - name: Hacer solicitud para eliminar cuentas pendientes
         run: |
-          curl -X DELETE ${{ secrets.API_http }} \
-          -H "Authorization: Bearer ${{ secrets.API_PASSWORD }}"
-          
+          response=$(curl -s -w "%{http_code}" -o /dev/null -X DELETE ${{ secrets.API_http }} \
+            -H "Authorization: Bearer ${{ secrets.API_PASSWORD }}")
+          if [ "$response" -eq 200 ]; then
+            echo "Cuentas programadas eliminadas con éxito."
+          else
+            echo "Error al eliminar cuentas programadas. Código de respuesta: $response"
+            exit 1
+          fi
+
       - name: Confirmación de eliminación
         run: echo "Se ha solicitado la eliminación de cuentas programadas."

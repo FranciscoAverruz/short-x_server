@@ -9,17 +9,17 @@ servers:
 tags:
   - name: "Authentication"
     description: "Operations related to login, registration, and URL redirection."
+  - name: "Administration"
+    description: "Administrative operations requiring administrator permissions."
   - name: "User"
     description: "Operations for managing users and their data."
   - name: "URLs"
     description: "Operations to shorten, redirect, and manage URLs."
   - name: "Stats"
     description: "Operations for obtaining statistics of user URLs."
-  - name: "Administration"
-    description: "Administrative operations requiring administrator permissions."
 
 security:
-  - BearerAuth: []
+  - bearerAuth: []
 
 paths:
   $ref: './index.yaml' # Referencia todo el contenido del directorio `docs/`

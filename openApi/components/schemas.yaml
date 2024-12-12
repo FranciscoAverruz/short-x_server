@@ -1,4 +1,4 @@
-    User:
+    user:
       type: object
       properties:
         username:
@@ -14,8 +14,20 @@
           type: boolean
           description: Indicates whether the user has admin privileges
           default: false
+  
+    userCreate:
+      type: object
+      properties:
+        password:
+          type: string
+          description: The username of the user
+          example: newUser123
+        confirmPassword:
+          type: string
+          description: Confirmación de la nueva contraseña.
+          example: "newpassword123"
     
-    UserComplement:
+    userComplement:
       type: object
       properties:
         _id:
@@ -36,14 +48,14 @@
           format: date-time
           description: The date and time when the user was last updated
 
-    InvitedPost:
+    invitedPost:
       type: object
       properties:
         originalUrl:
           type: string
           description: The original URL to shorten.
 
-    URLS:
+    URLs:
       type: object
       properties:
         originalUrl:
@@ -64,7 +76,7 @@
         - shortId
       additionalProperties: false
 
-    Click:
+    click:
       type: object
       properties:
         url:
@@ -98,7 +110,7 @@
           description: The type of device used for the click.
           example: "mobile"
 
-    GeneralClicks:
+    generalClicks:
       type: object
       properties:
         shortLink:
@@ -111,7 +123,7 @@
           type: integer
           example: 123
 
-    DetailedClicks:
+    detailedClicks:
       type: object
       properties:          
         locationsCount:
@@ -128,7 +140,7 @@
           type: integer
           example: 38
 
-    Pagination:
+    pagination:
       type: object
       properties:
         totalUrls:
@@ -148,10 +160,10 @@
           example: 10
           description: "Limit of results per page (provided by the user)"
 
-    DetailedUrlStats:
+    detailedUrlStats:
       allOf:
-        - $ref: '#/GeneralClicks'
+        - $ref: '#/generalClicks'
         - type: object
           properties:
             detailedClicks:
-              $ref: '#/DetailedClicks'
+              $ref: '#/detailedClicks'

@@ -1,0 +1,45 @@
+  /admin-user/{id}:
+    get:
+      tags:
+        - Administration
+      summary: "Get user details by ID."
+      description: "Retrieve detailed information for a specific user by their unique identifier."
+      allOf:
+        - $ref: './components/userDetails.yaml#/getOneUser'
+
+    put:
+      tags:
+        - Administration
+      summary: "Update user information by ID"
+      description: "Update the details of a specific user by their ID, without modifying the password."
+      allOf:
+        - $ref: './components/userDetails.yaml#/updateUser'        
+
+  /admin-user/{id}/password:
+    put:
+      tags:
+        - Administration
+      summary: "Change a user's password"
+      description: "Change a user's password by providing the current and new passwords."
+      allOf:     
+        - $ref: './components/userDetails.yaml#/changePassword'
+  
+  /admin-user/{id}/request-deletion:
+    post:
+      tags:
+        - Administration
+      summary: "Account deletion request"
+      description: > 
+        Allows a user to request their account deletion.
+        - **Administrators** can delete the account immediately or schedule it for deletion by specifying `deletionTimeInHours`.
+      allOf:
+        - $ref: './components/userDetails.yaml#/accountDeletion'
+  
+  /admin-user/{id}/cancel-deletion:
+    post:
+      tags:
+        - Administration
+      summary: "Cancel account deletion."
+      description: "Cancel account deletion (before the 24-hour period ends)."
+      allOf:
+        - $ref: './components/userDetails.yaml#/cancelDeletion'

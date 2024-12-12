@@ -1,0 +1,17 @@
+  shorten:
+    post:
+      tags:
+        - URLs
+      summary: "Shorten a URL for a user."
+      description: "Shorten a URL for a users"
+      allOf:
+        - $ref: './userDetails.yaml#/urlShorten'
+
+  deletion:
+    delete:
+      tags:
+        - URLs
+      summary: "Delete user's URLs"
+      description: "Delete one or multiple shortened URLs associated with the user's account."
+      allOf:
+        - $ref: './userDetails.yaml#/deleteUrls'

@@ -1,15 +1,15 @@
     # ******** 200 ************************************************
-    UserFound:
+    userFound:
       200:
         description: User successfully retrieved
         content:
           application/json:
             schema:
               allOf:
-                - $ref: './schemas.yaml#/User'
-                - $ref: './schemas.yaml#/UserComplement'
+                - $ref: './schemas.yaml#/user'
+                - $ref: './schemas.yaml#/userComplement'
 
-    AllurlsFound:
+    allurlsFound:
       200:
         description: User successfully retrieved URLs or no URLs available
         content:
@@ -17,18 +17,18 @@
             schema:
               type: array
               items:
-                $ref: './schemas.yaml#/AllurlsFound'
+                $ref: './schemas.yaml#/allurlsFound'
             example: []
 
-    UpdatedUser:
+    updatedUser:
       200:
         description: User updated successfully.
         content:
           application/json:
             schema:
-              - $ref: './schemas.yaml#/User'
+              - $ref: './schemas.yaml#/user'
 
-    UpdatedPassword:
+    updatedPassword:
       200:
         description: password updated successfully.
         content:
@@ -40,7 +40,7 @@
                   type: string
                   example: "You have successfully updated your password."
     
-    DelRequest:
+    delRequest:
       200:
         description: Request submitted successfully.
         content:
@@ -52,7 +52,7 @@
                   type: string
                   example: "Your account deletion will be completed in 24 hours."
   
-    CancelRequest:
+    cancelRequest:
       200:
         description: Request submitted successfully.
         content:
@@ -64,7 +64,7 @@
                   type: string
                   example: "Your account deletion has been canceled. Thank you for continuing to use our service."
     
-    URLDeletion:
+    urlDeletion:
       200:
         description: URLs deletion was successfull.
         content:
@@ -76,7 +76,7 @@
                   type: string
                   example: "3 URLs deleted successfully"
 
-    UserStats:
+    userStats:
       200:
         description: "Statistics fetched successfully."
         content:
@@ -87,62 +87,62 @@
                 stats:
                   type: array
                   items:
-                    $ref: './schemas.yaml#/GeneralClicks'
+                    $ref: './schemas.yaml#/generalClicks'
                 pagination:
-                  $ref: './schemas.yaml#/Pagination'
+                  $ref: './schemas.yaml#/pagination'
     
-    UrlStats:
+    urlStats:
       200:
         description: "Statistics fetched successfully."
         content:
           application/json:
             schema:
-              $ref: './schemas.yaml#/DetailedUrlStats'
+              $ref: './schemas.yaml#/detailedUrlStats'
     
 # *********************************************************************
 
-    NewURL: # 201
+    newURL: # 201
       201:
         description: URL shortened successfully
         content:
           application/json:
             schema:
-              $ref: './schemas.yaml#/URLS'
+              $ref: './schemas.yaml#/URLs'
 
-    BadRequest: # 400
+    badRequest: # 400
       description: "The request could not be processed due to invalid or duplicated input, missing parameters, or mismatched data."
       content:
         application/json:
           schema:
-            $ref: './responsesSchema.yaml#/Error400'
+            $ref: './responsesSchema.yaml#/error400'
 
-    Unauthorized: # 401
+    unauthorized: # 401
       description: "You are not authorized to access this resource. Please log in and try again."
       content:
         application/json:
           schema:
-            $ref: './responsesSchema.yaml#/Error401'
+            $ref: './responsesSchema.yaml#/error401'
 
-    InfoNotFound: # 404
+    infoNotFound: # 404
       description: "The requested resource could not be found. Please check the provided data and try again."
       content:
         application/json:
           schema:
-            $ref: './responsesSchema.yaml#/Error404'
+            $ref: './responsesSchema.yaml#/error404'
 
-    ServerError: # 500
+    serverError: # 500
       description: "An unexpected error occurred on the server. Please try again later."
       content:
         application/json:
           schema:
-            $ref: './responsesSchema.yaml#/Error500'
+            $ref: './responsesSchema.yaml#/error500'
 
-    CommonErrors:
+    commonErrors:
           400:
-            $ref: '#/BadRequest'
+            $ref: '#/badRequest'
           401:
-            $ref: '#/Unauthorized'
+            $ref: '#/unauthorized'
           404:
-            $ref: '#/InfoNotFound'
+            $ref: '#/infoNotFound'
           500:
-            $ref: '#/ServerError'
+            $ref: '#/serverError'

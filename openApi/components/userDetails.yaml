@@ -1,0 +1,104 @@
+  getOneUser:
+    parameters:
+      - $ref: './parameters.yaml#/userIdParam'
+    responses:
+      allOf:
+        - $ref: './responses.yaml#/userFound'
+        - $ref: './responses.yaml#/commonErrors'
+
+  updateUser:
+    parameters:
+      - $ref: './parameters.yaml#/userIdParam'
+    requestBody:
+      $ref: './requestBodies.yaml#/userUpdate'
+    responses:
+      allOf:
+        - $ref: './responses.yaml#/updatedUser'
+        - $ref: './responses.yaml#/commonErrors'
+
+  changePassword:
+    parameters:
+      - $ref: './parameters.yaml#/userIdParam'
+    requestBody:
+      $ref: './requestBodies.yaml#/passwordChange'
+    responses:
+      allOf:
+        - $ref: './responses.yaml#/updatedPassword'
+        - $ref: './responses.yaml#/commonErrors'
+
+  accountDeletion:
+    parameters:
+      - $ref: './parameters.yaml#/userIdParam'
+    requestBody:
+      $ref: './requestBodies.yaml#/requestCancelation'
+    responses:
+      allOf:
+        - $ref: './responses.yaml#/delRequest'
+        - $ref: './responses.yaml#/commonErrors'
+
+  cancelDeletion:
+    parameters:
+      - $ref: './parameters.yaml#/userIdParam'
+    responses:
+      allOf:
+        - $ref: './responses.yaml#/cancelRequest'
+        - $ref: './responses.yaml#/commonErrors'
+
+  urlShorten:
+    parameters:
+      - $ref: './parameters.yaml#/userIdParam'
+    requestBody:
+      $ref: './requestBodies.yaml##/URLs'
+    responses:
+      allOf:
+        - $ref: './responses.yaml#/newURL'
+        - $ref: './responses.yaml#/commonErrors'
+
+  deleteUrls:
+    parameters:
+      - $ref: './parameters.yaml#/userIdParam'
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              shortIds:
+                type: array
+                items:
+                  type: string
+                description: An array of short IDs representing the URLs to delete.
+            required:
+              - shortIds
+    responses:
+      allOf:
+        - $ref: './responses.yaml#/urlDeletion'
+        - $ref: './responses.yaml#/commonErrors'
+  
+  userStatistics:
+    parameters:
+      allOf:
+        - $ref: './parameters.yaml#/userIdParam'
+        - $ref: './parameters.yaml#/page'
+        - $ref: './parameters.yaml#/limit'
+    responses:
+      allOf:
+        - $ref: './responses.yaml#/userStats'
+        - $ref: './responses.yaml#/commonErrors'
+
+  urlStatistic:
+    parameters:
+      allOf:
+        - $ref: './parameters.yaml#/userIdParam'
+        - name: shortId
+          in: path
+          description: "Short ID of the URL"
+          required: true
+          schema:
+            type: string
+            example: "abc123short"
+    responses:
+      allOf:
+        - $ref: './responses.yaml#/urlStats'
+        - $ref: './responses.yaml#/commonErrors'
