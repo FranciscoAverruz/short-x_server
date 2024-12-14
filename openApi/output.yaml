@@ -39,7 +39,7 @@ paths:
           responses:
             allOf:
               - '200':
-                  description: User successfully retrieved
+                  description: User successfully created or retrieved.
                   content:
                     application/json:
                       schema:
@@ -58,9 +58,13 @@ paths:
                               isAdmin:
                                 type: boolean
                                 description: >-
-                                  Indicates whether the user has admin
-                                  privileges
+                                  A flag indicating whether the user is an
+                                  admin. Default is false for regular users.
                                 default: false
+                            required:
+                              - username
+                              - email
+                              - isAdmin
                           - type: object
                             properties:
                               _id:
@@ -98,7 +102,8 @@ paths:
                             description: A detailed message about the error.
                             example: >-
                               The request could not be processed due to invalid
-                              input, missing parameters, or mismatched data.
+                              or expired input, missing parameters, or
+                              mismatched data.
                 '401':
                   description: >-
                     You are not authorized to access this resource. Please log
@@ -179,8 +184,14 @@ paths:
                       example: newEmail@example.com
                     isAdmin:
                       type: boolean
-                      description: Indicates whether the user has admin privileges
+                      description: >-
+                        A flag indicating whether the user is an admin. Default
+                        is false for regular users.
                       default: false
+                  required:
+                    - username
+                    - email
+                    - isAdmin
           responses:
             allOf:
               - '200':
@@ -201,8 +212,14 @@ paths:
                               example: newEmail@example.com
                             isAdmin:
                               type: boolean
-                              description: Indicates whether the user has admin privileges
+                              description: >-
+                                A flag indicating whether the user is an admin.
+                                Default is false for regular users.
                               default: false
+                          required:
+                            - username
+                            - email
+                            - isAdmin
               - '400':
                   description: >-
                     The request could not be processed due to invalid or
@@ -217,7 +234,8 @@ paths:
                             description: A detailed message about the error.
                             example: >-
                               The request could not be processed due to invalid
-                              input, missing parameters, or mismatched data.
+                              or expired input, missing parameters, or
+                              mismatched data.
                 '401':
                   description: >-
                     You are not authorized to access this resource. Please log
@@ -263,7 +281,7 @@ paths:
                             example: >-
                               An unexpected error occurred on the server. Please
                               try again later.
-  '/admin-user/{id}/password':
+  '/admin-user/{id}/change-password':
     put:
       tags:
         - Administration
@@ -325,7 +343,210 @@ paths:
                             description: A detailed message about the error.
                             example: >-
                               The request could not be processed due to invalid
-                              input, missing parameters, or mismatched data.
+                              or expired input, missing parameters, or
+                              mismatched data.
+                '401':
+                  description: >-
+                    You are not authorized to access this resource. Please log
+                    in and try again.
+                  content:
+                    application/json:
+                      schema:
+                        type: object
+                        properties:
+                          message:
+                            type: string
+                            description: A detailed message about the error.
+                            example: >-
+                              You are not authorized to access this resource.
+                              Please log in and try again.
+                '404':
+                  description: >-
+                    The requested resource could not be found. Please check the
+                    provided data and try again.
+                  content:
+                    application/json:
+                      schema:
+                        type: object
+                        properties:
+                          message:
+                            type: string
+                            description: A detailed message about the error.
+                            example: >-
+                              The requested resource could not be found. Please
+                              check the provided data and try again.
+                '500':
+                  description: >-
+                    An unexpected error occurred on the server. Please try again
+                    later.
+                  content:
+                    application/json:
+                      schema:
+                        type: object
+                        properties:
+                          message:
+                            type: string
+                            description: A detailed message about the error.
+                            example: >-
+                              An unexpected error occurred on the server. Please
+                              try again later.
+  '/admin-user/{id}/setup-password':
+    post:
+      tags:
+        - Administration
+      summary: Set up a password
+      description: >-
+        Allows users to set their password after account creation via a secure
+        link sent by email.
+      allOf:
+        - requestBody:
+            description: Request body for setting up a new password after account creation
+            content:
+              application/json:
+                schema:
+                  type: object
+                  properties:
+                    token:
+                      type: string
+                      description: The token sent to the user in the password setup email.
+                    newPassword:
+                      type: string
+                      description: The new password the user wants to set.
+                    confirmPassword:
+                      type: string
+                      description: >-
+                        Confirmation of the new password to ensure both
+                        passwords match.
+                  required:
+                    - token
+                    - newPassword
+                    - confirmPassword
+          responses:
+            allOf:
+              - '200':
+                  description: password updated successfully.
+                  content:
+                    application/json:
+                      schema:
+                        type: object
+                        properties:
+                          message:
+                            type: string
+                            example: You have successfully updated your password.
+              - '400':
+                  description: >-
+                    The request could not be processed due to invalid or
+                    duplicated input, missing parameters, or mismatched data.
+                  content:
+                    application/json:
+                      schema:
+                        type: object
+                        properties:
+                          message:
+                            type: string
+                            description: A detailed message about the error.
+                            example: >-
+                              The request could not be processed due to invalid
+                              or expired input, missing parameters, or
+                              mismatched data.
+                '401':
+                  description: >-
+                    You are not authorized to access this resource. Please log
+                    in and try again.
+                  content:
+                    application/json:
+                      schema:
+                        type: object
+                        properties:
+                          message:
+                            type: string
+                            description: A detailed message about the error.
+                            example: >-
+                              You are not authorized to access this resource.
+                              Please log in and try again.
+                '404':
+                  description: >-
+                    The requested resource could not be found. Please check the
+                    provided data and try again.
+                  content:
+                    application/json:
+                      schema:
+                        type: object
+                        properties:
+                          message:
+                            type: string
+                            description: A detailed message about the error.
+                            example: >-
+                              The requested resource could not be found. Please
+                              check the provided data and try again.
+                '500':
+                  description: >-
+                    An unexpected error occurred on the server. Please try again
+                    later.
+                  content:
+                    application/json:
+                      schema:
+                        type: object
+                        properties:
+                          message:
+                            type: string
+                            description: A detailed message about the error.
+                            example: >-
+                              An unexpected error occurred on the server. Please
+                              try again later.
+  '/admin-user/{id}/request-newPassword':
+    post:
+      tags:
+        - Administration
+      summary: Request a password reset
+      description: >-
+        Sends a password reset email to the provided email address with a reset
+        link.
+      allOf:
+        - requestBody:
+            description: Request body for setting up a new password after account creation
+            content:
+              application/json:
+                schema:
+                  type: object
+                  properties:
+                    email:
+                      type: string
+                      format: email
+                      description: >-
+                        The email address of the user requesting a password
+                        reset.
+                      example: user@example.com
+          responses:
+            allOf:
+              - '200':
+                  description: Password reset email sent successfully.
+                  content:
+                    application/json:
+                      schema:
+                        type: object
+                        properties:
+                          message:
+                            type: string
+                            example: >-
+                              Password reset email has been sent. Please check
+                              your inbox.
+              - '400':
+                  description: >-
+                    The request could not be processed due to invalid or
+                    duplicated input, missing parameters, or mismatched data.
+                  content:
+                    application/json:
+                      schema:
+                        type: object
+                        properties:
+                          message:
+                            type: string
+                            description: A detailed message about the error.
+                            example: >-
+                              The request could not be processed due to invalid
+                              or expired input, missing parameters, or
+                              mismatched data.
                 '401':
                   description: >-
                     You are not authorized to access this resource. Please log
@@ -377,9 +598,8 @@ paths:
         - Administration
       summary: Account deletion request
       description: >
-        Allows a user to request their account deletion. - **Administrators**
-        can delete the account immediately or schedule it for deletion by
-        specifying `deletionTimeInHours`.
+        Allows a user to request their account deletion. - **Regular users** can
+        only schedule their own account for deletion (default is 24 hours).
       allOf:
         - parameters:
             - name: id
@@ -434,7 +654,8 @@ paths:
                             description: A detailed message about the error.
                             example: >-
                               The request could not be processed due to invalid
-                              input, missing parameters, or mismatched data.
+                              or expired input, missing parameters, or
+                              mismatched data.
                 '401':
                   description: >-
                     You are not authorized to access this resource. Please log
@@ -523,7 +744,8 @@ paths:
                             description: A detailed message about the error.
                             example: >-
                               The request could not be processed due to invalid
-                              input, missing parameters, or mismatched data.
+                              or expired input, missing parameters, or
+                              mismatched data.
                 '401':
                   description: >-
                     You are not authorized to access this resource. Please log
@@ -573,9 +795,8 @@ paths:
     get:
       tags:
         - Administration
-      summary: Obtener todos los usuarios
-      description: Devuelve una lista de todos los usuarios registrados.
-      operationId: retUsersAll
+      summary: Get all users
+      description: Returns a collection of all existing users.
       responses:
         '200':
           description: Lista de todos los usuarios
@@ -585,9 +806,8 @@ paths:
     post:
       tags:
         - Administration
-      summary: Crear nuevo usuario
-      description: Crea un nuevo usuario en el sistema.
-      operationId: createUser
+      summary: Creates a new user
+      description: Adds a new user profile to the system.
       requestBody:
         description: Datos para actualizar un usuario.
         required: true
@@ -608,8 +828,14 @@ paths:
                       example: newEmail@example.com
                     isAdmin:
                       type: boolean
-                      description: Indicates whether the user has admin privileges
+                      description: >-
+                        A flag indicating whether the user is an admin. Default
+                        is false for regular users.
                       default: false
+                  required:
+                    - username
+                    - email
+                    - isAdmin
                 - type: object
                   properties:
                     password:
@@ -620,69 +846,443 @@ paths:
                       type: string
                       description: Confirmación de la nueva contraseña.
                       example: newpassword123
-      responses:
-        '201':
-          description: Usuario creado exitosamente
-        '400':
-          description: Error al crear usuario
+                    urls:
+                      type: array
+                      description: >-
+                        List of URLs associated with the user. It can be empty
+                        or null if the user hasn't added any URLs yet.
+                      items:
+                        type: string
+                        example: 'https://example.com'
+                      nullable: true
+                      default: []
+                  required:
+                    - password
+    responses:
+      allOf:
+        - '200':
+            description: User successfully created or retrieved.
+            content:
+              application/json:
+                schema:
+                  allOf:
+                    - type: object
+                      properties:
+                        username:
+                          type: string
+                          description: The username of the user
+                          example: newUser123
+                        email:
+                          type: string
+                          format: email
+                          description: The email of the user
+                          example: newEmail@example.com
+                        isAdmin:
+                          type: boolean
+                          description: >-
+                            A flag indicating whether the user is an admin.
+                            Default is false for regular users.
+                          default: false
+                      required:
+                        - username
+                        - email
+                        - isAdmin
+                    - type: object
+                      properties:
+                        _id:
+                          type: string
+                          description: Unique identifier for the user
+                        urls:
+                          type: array
+                          items:
+                            type: string
+                            format: uuid
+                            description: >-
+                              Array of URLs associated with the user (references
+                              to other documents)
+                        createdAt:
+                          type: string
+                          format: date-time
+                          description: The date and time when the user was created
+                        updatedAt:
+                          type: string
+                          format: date-time
+                          description: The date and time when the user was last updated
+        - '400':
+            description: >-
+              The request could not be processed due to invalid or duplicated
+              input, missing parameters, or mismatched data.
+            content:
+              application/json:
+                schema:
+                  type: object
+                  properties:
+                    message:
+                      type: string
+                      description: A detailed message about the error.
+                      example: >-
+                        The request could not be processed due to invalid or
+                        expired input, missing parameters, or mismatched data.
+          '401':
+            description: >-
+              You are not authorized to access this resource. Please log in and
+              try again.
+            content:
+              application/json:
+                schema:
+                  type: object
+                  properties:
+                    message:
+                      type: string
+                      description: A detailed message about the error.
+                      example: >-
+                        You are not authorized to access this resource. Please
+                        log in and try again.
+          '404':
+            description: >-
+              The requested resource could not be found. Please check the
+              provided data and try again.
+            content:
+              application/json:
+                schema:
+                  type: object
+                  properties:
+                    message:
+                      type: string
+                      description: A detailed message about the error.
+                      example: >-
+                        The requested resource could not be found. Please check
+                        the provided data and try again.
+          '500':
+            description: >-
+              An unexpected error occurred on the server. Please try again
+              later.
+            content:
+              application/json:
+                schema:
+                  type: object
+                  properties:
+                    message:
+                      type: string
+                      description: A detailed message about the error.
+                      example: >-
+                        An unexpected error occurred on the server. Please try
+                        again later.
   /login:
     post:
       tags:
         - Authentication
       summary: Inicio de sesión
       description: Permite a un usuario iniciar sesión.
-      operationId: loginUser
       security: []
-      requestBody:
-        content:
-          application/json:
-            schema:
-              type: object
-              properties:
-                username:
-                  type: string
-                password:
-                  type: string
-      responses:
-        '200':
-          description: Éxito al iniciar sesión
-        '400':
-          description: Error en los datos de inicio de sesión
+      allOf:
+        - requestBody:
+            description: Request body to log in
+            required: true
+            content:
+              application/json:
+                schema:
+                  type: object
+                  properties:
+                    email:
+                      type: string
+                      format: email
+                      description: The email of the user
+                      example: newEmail@example.com
+                    password:
+                      type: string
+                      description: The user's password
+                      example: newUser123
+          responses:
+            allOf:
+              - '200':
+                  description: Successful login. A JWT token is returned.
+                  content:
+                    application/json:
+                      schema:
+                        type: object
+                        properties:
+                          token:
+                            type: string
+                            description: JWT token generated for the user.
+                            example: >-
+                              eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoxMjM0NTY3ODkwLCJleHBpcnkiOjEyMzQ1Njc4OTAgfQ.XeQF1G6ZGnzGv9Qrfm8tL8r8JkxY
+              - '400':
+                  description: >-
+                    The request could not be processed due to invalid or
+                    duplicated input, missing parameters, or mismatched data.
+                  content:
+                    application/json:
+                      schema:
+                        type: object
+                        properties:
+                          message:
+                            type: string
+                            description: A detailed message about the error.
+                            example: >-
+                              The request could not be processed due to invalid
+                              or expired input, missing parameters, or
+                              mismatched data.
+                '401':
+                  description: >-
+                    You are not authorized to access this resource. Please log
+                    in and try again.
+                  content:
+                    application/json:
+                      schema:
+                        type: object
+                        properties:
+                          message:
+                            type: string
+                            description: A detailed message about the error.
+                            example: >-
+                              You are not authorized to access this resource.
+                              Please log in and try again.
+                '404':
+                  description: >-
+                    The requested resource could not be found. Please check the
+                    provided data and try again.
+                  content:
+                    application/json:
+                      schema:
+                        type: object
+                        properties:
+                          message:
+                            type: string
+                            description: A detailed message about the error.
+                            example: >-
+                              The requested resource could not be found. Please
+                              check the provided data and try again.
+                '500':
+                  description: >-
+                    An unexpected error occurred on the server. Please try again
+                    later.
+                  content:
+                    application/json:
+                      schema:
+                        type: object
+                        properties:
+                          message:
+                            type: string
+                            description: A detailed message about the error.
+                            example: >-
+                              An unexpected error occurred on the server. Please
+                              try again later.
   /signup:
     post:
       tags:
         - Authentication
       summary: Registro de usuario
-      description: Permite a un nuevo usuario registrarse.
-      operationId: signupUser
+      description: >
+        This function allows users to register. If the user is an admin, they
+        can create another user and send an email for password setup.  For
+        non-admin users, they can register normally and receive a registration
+        confirmation email.
       security: []
-      requestBody:
-        content:
-          application/json:
-            schema:
-              type: object
-              properties:
-                username:
-                  type: string
-                password:
-                  type: string
-      responses:
-        '201':
-          description: Usuario creado con éxito
-        '400':
-          description: Error al crear usuario
+      allOf:
+        - requestBody:
+            description: Datos para actualizar un usuario.
+            required: true
+            content:
+              application/json:
+                schema:
+                  allOf:
+                    - type: object
+                      properties:
+                        username:
+                          type: string
+                          description: The username of the user
+                          example: newUser123
+                        email:
+                          type: string
+                          format: email
+                          description: The email of the user
+                          example: newEmail@example.com
+                        isAdmin:
+                          type: boolean
+                          description: >-
+                            A flag indicating whether the user is an admin.
+                            Default is false for regular users.
+                          default: false
+                      required:
+                        - username
+                        - email
+                        - isAdmin
+                    - type: object
+                      properties:
+                        password:
+                          type: string
+                          description: The username of the user
+                          example: newUser123
+                        confirmPassword:
+                          type: string
+                          description: Confirmación de la nueva contraseña.
+                          example: newpassword123
+                        urls:
+                          type: array
+                          description: >-
+                            List of URLs associated with the user. It can be
+                            empty or null if the user hasn't added any URLs yet.
+                          items:
+                            type: string
+                            example: 'https://example.com'
+                          nullable: true
+                          default: []
+                      required:
+                        - password
+          responses:
+            allOf:
+              - '201':
+                  description: User registered successfully.
+                  content:
+                    application/json:
+                      schema:
+                        type: object
+                        properties:
+                          message:
+                            type: string
+                            example: The User was successfully registered.
+              - '400':
+                  description: >-
+                    The request could not be processed due to invalid or
+                    duplicated input, missing parameters, or mismatched data.
+                  content:
+                    application/json:
+                      schema:
+                        type: object
+                        properties:
+                          message:
+                            type: string
+                            description: A detailed message about the error.
+                            example: >-
+                              The request could not be processed due to invalid
+                              or expired input, missing parameters, or
+                              mismatched data.
+                '401':
+                  description: >-
+                    You are not authorized to access this resource. Please log
+                    in and try again.
+                  content:
+                    application/json:
+                      schema:
+                        type: object
+                        properties:
+                          message:
+                            type: string
+                            description: A detailed message about the error.
+                            example: >-
+                              You are not authorized to access this resource.
+                              Please log in and try again.
+                '404':
+                  description: >-
+                    The requested resource could not be found. Please check the
+                    provided data and try again.
+                  content:
+                    application/json:
+                      schema:
+                        type: object
+                        properties:
+                          message:
+                            type: string
+                            description: A detailed message about the error.
+                            example: >-
+                              The requested resource could not be found. Please
+                              check the provided data and try again.
+                '500':
+                  description: >-
+                    An unexpected error occurred on the server. Please try again
+                    later.
+                  content:
+                    application/json:
+                      schema:
+                        type: object
+                        properties:
+                          message:
+                            type: string
+                            description: A detailed message about the error.
+                            example: >-
+                              An unexpected error occurred on the server. Please
+                              try again later.
   /logout:
     post:
       tags:
         - Authentication
-      summary: Cerrar sesión
-      description: Permite a un usuario cerrar sesión.
-      operationId: logoutUser
+      summary: Log out
+      description: Allows a user to log out.
       responses:
-        '200':
-          description: Éxito al cerrar sesión
-        '401':
-          description: No autorizado
+        allOf:
+          - '200':
+              description: logged out
+              content:
+                application/json:
+                  schema:
+                    type: object
+                    properties:
+                      message:
+                        type: string
+                        example: >-
+                          You have successfully logged out, please come back
+                          soon.
+          - '400':
+              description: >-
+                The request could not be processed due to invalid or duplicated
+                input, missing parameters, or mismatched data.
+              content:
+                application/json:
+                  schema:
+                    type: object
+                    properties:
+                      message:
+                        type: string
+                        description: A detailed message about the error.
+                        example: >-
+                          The request could not be processed due to invalid or
+                          expired input, missing parameters, or mismatched data.
+            '401':
+              description: >-
+                You are not authorized to access this resource. Please log in
+                and try again.
+              content:
+                application/json:
+                  schema:
+                    type: object
+                    properties:
+                      message:
+                        type: string
+                        description: A detailed message about the error.
+                        example: >-
+                          You are not authorized to access this resource. Please
+                          log in and try again.
+            '404':
+              description: >-
+                The requested resource could not be found. Please check the
+                provided data and try again.
+              content:
+                application/json:
+                  schema:
+                    type: object
+                    properties:
+                      message:
+                        type: string
+                        description: A detailed message about the error.
+                        example: >-
+                          The requested resource could not be found. Please
+                          check the provided data and try again.
+            '500':
+              description: >-
+                An unexpected error occurred on the server. Please try again
+                later.
+              content:
+                application/json:
+                  schema:
+                    type: object
+                    properties:
+                      message:
+                        type: string
+                        description: A detailed message about the error.
+                        example: >-
+                          An unexpected error occurred on the server. Please try
+                          again later.
   '/admin-user/{id}/stats':
     get:
       tags:
@@ -777,7 +1377,8 @@ paths:
                             description: A detailed message about the error.
                             example: >-
                               The request could not be processed due to invalid
-                              input, missing parameters, or mismatched data.
+                              or expired input, missing parameters, or
+                              mismatched data.
                 '401':
                   description: >-
                     You are not authorized to access this resource. Please log
@@ -899,7 +1500,8 @@ paths:
                             description: A detailed message about the error.
                             example: >-
                               The request could not be processed due to invalid
-                              input, missing parameters, or mismatched data.
+                              or expired input, missing parameters, or
+                              mismatched data.
                 '401':
                   description: >-
                     You are not authorized to access this resource. Please log
@@ -1039,7 +1641,8 @@ paths:
                             description: A detailed message about the error.
                             example: >-
                               The request could not be processed due to invalid
-                              input, missing parameters, or mismatched data.
+                              or expired input, missing parameters, or
+                              mismatched data.
                 '401':
                   description: >-
                     You are not authorized to access this resource. Please log
@@ -1161,7 +1764,8 @@ paths:
                             description: A detailed message about the error.
                             example: >-
                               The request could not be processed due to invalid
-                              input, missing parameters, or mismatched data.
+                              or expired input, missing parameters, or
+                              mismatched data.
                 '401':
                   description: >-
                     You are not authorized to access this resource. Please log
@@ -1209,10 +1813,13 @@ paths:
                               try again later.
   /invited/shortenId:
     post:
+      tags:
+        - URLs
       summary: Shorten a URL link
       description: >-
-        Accepts an original URL and generates a random short URL, which expires
-        24 hours after its creation.
+        This function allows non-registered users to shorten a URL. The
+        shortened URL expires after 24 hours by default.
+      security: []
       requestBody:
         required: true
         content:
@@ -1222,54 +1829,192 @@ paths:
               properties:
                 originalUrl:
                   type: string
-                  description: The original URL to shorten.
+                  description: The original URL to be shortened.
+                  example: 'https://example.com/some/long/url'
+              required:
+                - originalUrl
       responses:
-        '201':
-          description: Short URL generated successfully.
-        '400':
-          description: >-
-            The request could not be processed due to invalid or duplicated
-            input, missing parameters, or mismatched data.
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  message:
-                    type: string
-                    description: A detailed message about the error.
-                    example: >-
-                      The request could not be processed due to invalid input,
-                      missing parameters, or mismatched data.
-        '500':
-          description: An unexpected error occurred on the server. Please try again later.
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  message:
-                    type: string
-                    description: A detailed message about the error.
-                    example: >-
-                      An unexpected error occurred on the server. Please try
-                      again later.
+        allOf:
+          - '201':
+              description: URL shortened successfully
+              content:
+                application/json:
+                  schema:
+                    allOf:
+                      - type: object
+                        properties:
+                          originalUrl:
+                            type: string
+                            description: Original URL.
+                            example: 'https://example.com/some/long/url'
+                          shortId:
+                            type: string
+                            description: Custom url ID.
+                            example: CustomID
+                          user:
+                            type: string
+                            description: >-
+                              ID of the user who owns the URL (MongoDB
+                              ObjectId).
+                            example: 60d5f3a0f8d2e87d8f0f8c9b
+                            nullable: true
+                        required:
+                          - originalUrl
+                          - shortId
+                        additionalProperties: false
+                      - type: object
+                        properties:
+                          expiresAt:
+                            type: string
+                            format: date-time
+                            description: The expiration date and time for the short URL.
+                            example: '2024-06-15T12:00:00.000Z'
+          - '400':
+              description: >-
+                The request could not be processed due to invalid or duplicated
+                input, missing parameters, or mismatched data.
+              content:
+                application/json:
+                  schema:
+                    type: object
+                    properties:
+                      message:
+                        type: string
+                        description: A detailed message about the error.
+                        example: >-
+                          The request could not be processed due to invalid or
+                          expired input, missing parameters, or mismatched data.
+            '401':
+              description: >-
+                You are not authorized to access this resource. Please log in
+                and try again.
+              content:
+                application/json:
+                  schema:
+                    type: object
+                    properties:
+                      message:
+                        type: string
+                        description: A detailed message about the error.
+                        example: >-
+                          You are not authorized to access this resource. Please
+                          log in and try again.
+            '404':
+              description: >-
+                The requested resource could not be found. Please check the
+                provided data and try again.
+              content:
+                application/json:
+                  schema:
+                    type: object
+                    properties:
+                      message:
+                        type: string
+                        description: A detailed message about the error.
+                        example: >-
+                          The requested resource could not be found. Please
+                          check the provided data and try again.
+            '500':
+              description: >-
+                An unexpected error occurred on the server. Please try again
+                later.
+              content:
+                application/json:
+                  schema:
+                    type: object
+                    properties:
+                      message:
+                        type: string
+                        description: A detailed message about the error.
+                        example: >-
+                          An unexpected error occurred on the server. Please try
+                          again later.
   '/{shortId}':
     get:
-      summary: Redirigir a URL
-      description: Redirige a la URL original a partir de una URL corta.
-      operationId: urlRedirect
+      summary: Redirect to the original URL using the short ID
+      description: >-
+        Finds the original URL by the provided short ID and redirects the user.
+        Tracks the click event and handles expired or invalid URLs.
+      tags:
+        - URLs
       parameters:
-        - in: path
-          name: shortenedUrl
-          required: true
-          schema:
-            type: string
+        name: shortId
+        in: path
+        required: true
+        description: The unique short identifier for the URL.
+        schema:
+          type: string
+          example: abc123
       responses:
-        '302':
-          description: Redirección exitosa
-        '404':
-          description: Enlace no encontrado
+        allOf:
+          - '302':
+              description: Redirects to the original URL.
+              headers:
+                Location:
+                  description: The original URL to which the client is redirected.
+                  schema:
+                    type: string
+                    example: 'https://example.com/original-page'
+          - '400':
+              description: >-
+                The request could not be processed due to invalid or duplicated
+                input, missing parameters, or mismatched data.
+              content:
+                application/json:
+                  schema:
+                    type: object
+                    properties:
+                      message:
+                        type: string
+                        description: A detailed message about the error.
+                        example: >-
+                          The request could not be processed due to invalid or
+                          expired input, missing parameters, or mismatched data.
+            '401':
+              description: >-
+                You are not authorized to access this resource. Please log in
+                and try again.
+              content:
+                application/json:
+                  schema:
+                    type: object
+                    properties:
+                      message:
+                        type: string
+                        description: A detailed message about the error.
+                        example: >-
+                          You are not authorized to access this resource. Please
+                          log in and try again.
+            '404':
+              description: >-
+                The requested resource could not be found. Please check the
+                provided data and try again.
+              content:
+                application/json:
+                  schema:
+                    type: object
+                    properties:
+                      message:
+                        type: string
+                        description: A detailed message about the error.
+                        example: >-
+                          The requested resource could not be found. Please
+                          check the provided data and try again.
+            '500':
+              description: >-
+                An unexpected error occurred on the server. Please try again
+                later.
+              content:
+                application/json:
+                  schema:
+                    type: object
+                    properties:
+                      message:
+                        type: string
+                        description: A detailed message about the error.
+                        example: >-
+                          An unexpected error occurred on the server. Please try
+                          again later.
   '/admin-user/{id}/urls/shorten':
     post:
       tags:
@@ -1299,7 +2044,7 @@ paths:
                           originalUrl:
                             type: string
                             description: Original URL.
-                            example: 'https://example.com'
+                            example: 'https://example.com/some/long/url'
                           shortId:
                             type: string
                             description: Custom url ID.
@@ -1329,7 +2074,8 @@ paths:
                             description: A detailed message about the error.
                             example: >-
                               The request could not be processed due to invalid
-                              input, missing parameters, or mismatched data.
+                              or expired input, missing parameters, or
+                              mismatched data.
                 '401':
                   description: >-
                     You are not authorized to access this resource. Please log
@@ -1404,7 +2150,7 @@ paths:
                           originalUrl:
                             type: string
                             description: Original URL.
-                            example: 'https://example.com'
+                            example: 'https://example.com/some/long/url'
                           shortId:
                             type: string
                             description: Custom url ID.
@@ -1434,7 +2180,8 @@ paths:
                             description: A detailed message about the error.
                             example: >-
                               The request could not be processed due to invalid
-                              input, missing parameters, or mismatched data.
+                              or expired input, missing parameters, or
+                              mismatched data.
                 '401':
                   description: >-
                     You are not authorized to access this resource. Please log
@@ -1537,7 +2284,8 @@ paths:
                             description: A detailed message about the error.
                             example: >-
                               The request could not be processed due to invalid
-                              input, missing parameters, or mismatched data.
+                              or expired input, missing parameters, or
+                              mismatched data.
                 '401':
                   description: >-
                     You are not authorized to access this resource. Please log
@@ -1640,7 +2388,8 @@ paths:
                             description: A detailed message about the error.
                             example: >-
                               The request could not be processed due to invalid
-                              input, missing parameters, or mismatched data.
+                              or expired input, missing parameters, or
+                              mismatched data.
                 '401':
                   description: >-
                     You are not authorized to access this resource. Please log
@@ -1706,7 +2455,7 @@ paths:
           responses:
             allOf:
               - '200':
-                  description: User successfully retrieved
+                  description: User successfully created or retrieved.
                   content:
                     application/json:
                       schema:
@@ -1725,9 +2474,13 @@ paths:
                               isAdmin:
                                 type: boolean
                                 description: >-
-                                  Indicates whether the user has admin
-                                  privileges
+                                  A flag indicating whether the user is an
+                                  admin. Default is false for regular users.
                                 default: false
+                            required:
+                              - username
+                              - email
+                              - isAdmin
                           - type: object
                             properties:
                               _id:
@@ -1765,7 +2518,8 @@ paths:
                             description: A detailed message about the error.
                             example: >-
                               The request could not be processed due to invalid
-                              input, missing parameters, or mismatched data.
+                              or expired input, missing parameters, or
+                              mismatched data.
                 '401':
                   description: >-
                     You are not authorized to access this resource. Please log
@@ -1846,8 +2600,14 @@ paths:
                       example: newEmail@example.com
                     isAdmin:
                       type: boolean
-                      description: Indicates whether the user has admin privileges
+                      description: >-
+                        A flag indicating whether the user is an admin. Default
+                        is false for regular users.
                       default: false
+                  required:
+                    - username
+                    - email
+                    - isAdmin
           responses:
             allOf:
               - '200':
@@ -1868,8 +2628,14 @@ paths:
                               example: newEmail@example.com
                             isAdmin:
                               type: boolean
-                              description: Indicates whether the user has admin privileges
+                              description: >-
+                                A flag indicating whether the user is an admin.
+                                Default is false for regular users.
                               default: false
+                          required:
+                            - username
+                            - email
+                            - isAdmin
               - '400':
                   description: >-
                     The request could not be processed due to invalid or
@@ -1884,7 +2650,8 @@ paths:
                             description: A detailed message about the error.
                             example: >-
                               The request could not be processed due to invalid
-                              input, missing parameters, or mismatched data.
+                              or expired input, missing parameters, or
+                              mismatched data.
                 '401':
                   description: >-
                     You are not authorized to access this resource. Please log
@@ -1930,7 +2697,7 @@ paths:
                             example: >-
                               An unexpected error occurred on the server. Please
                               try again later.
-  '/user/{id}/password':
+  '/user/{id}/change-password':
     put:
       tags:
         - User
@@ -1992,7 +2759,210 @@ paths:
                             description: A detailed message about the error.
                             example: >-
                               The request could not be processed due to invalid
-                              input, missing parameters, or mismatched data.
+                              or expired input, missing parameters, or
+                              mismatched data.
+                '401':
+                  description: >-
+                    You are not authorized to access this resource. Please log
+                    in and try again.
+                  content:
+                    application/json:
+                      schema:
+                        type: object
+                        properties:
+                          message:
+                            type: string
+                            description: A detailed message about the error.
+                            example: >-
+                              You are not authorized to access this resource.
+                              Please log in and try again.
+                '404':
+                  description: >-
+                    The requested resource could not be found. Please check the
+                    provided data and try again.
+                  content:
+                    application/json:
+                      schema:
+                        type: object
+                        properties:
+                          message:
+                            type: string
+                            description: A detailed message about the error.
+                            example: >-
+                              The requested resource could not be found. Please
+                              check the provided data and try again.
+                '500':
+                  description: >-
+                    An unexpected error occurred on the server. Please try again
+                    later.
+                  content:
+                    application/json:
+                      schema:
+                        type: object
+                        properties:
+                          message:
+                            type: string
+                            description: A detailed message about the error.
+                            example: >-
+                              An unexpected error occurred on the server. Please
+                              try again later.
+  '/user/{id}/setup-password':
+    post:
+      tags:
+        - User
+      summary: Set up a password
+      description: >-
+        Allows users to set their password after account creation via a secure
+        link sent by email.
+      allOf:
+        - requestBody:
+            description: Request body for setting up a new password after account creation
+            content:
+              application/json:
+                schema:
+                  type: object
+                  properties:
+                    token:
+                      type: string
+                      description: The token sent to the user in the password setup email.
+                    newPassword:
+                      type: string
+                      description: The new password the user wants to set.
+                    confirmPassword:
+                      type: string
+                      description: >-
+                        Confirmation of the new password to ensure both
+                        passwords match.
+                  required:
+                    - token
+                    - newPassword
+                    - confirmPassword
+          responses:
+            allOf:
+              - '200':
+                  description: password updated successfully.
+                  content:
+                    application/json:
+                      schema:
+                        type: object
+                        properties:
+                          message:
+                            type: string
+                            example: You have successfully updated your password.
+              - '400':
+                  description: >-
+                    The request could not be processed due to invalid or
+                    duplicated input, missing parameters, or mismatched data.
+                  content:
+                    application/json:
+                      schema:
+                        type: object
+                        properties:
+                          message:
+                            type: string
+                            description: A detailed message about the error.
+                            example: >-
+                              The request could not be processed due to invalid
+                              or expired input, missing parameters, or
+                              mismatched data.
+                '401':
+                  description: >-
+                    You are not authorized to access this resource. Please log
+                    in and try again.
+                  content:
+                    application/json:
+                      schema:
+                        type: object
+                        properties:
+                          message:
+                            type: string
+                            description: A detailed message about the error.
+                            example: >-
+                              You are not authorized to access this resource.
+                              Please log in and try again.
+                '404':
+                  description: >-
+                    The requested resource could not be found. Please check the
+                    provided data and try again.
+                  content:
+                    application/json:
+                      schema:
+                        type: object
+                        properties:
+                          message:
+                            type: string
+                            description: A detailed message about the error.
+                            example: >-
+                              The requested resource could not be found. Please
+                              check the provided data and try again.
+                '500':
+                  description: >-
+                    An unexpected error occurred on the server. Please try again
+                    later.
+                  content:
+                    application/json:
+                      schema:
+                        type: object
+                        properties:
+                          message:
+                            type: string
+                            description: A detailed message about the error.
+                            example: >-
+                              An unexpected error occurred on the server. Please
+                              try again later.
+  '/user/{id}/request-newPassword':
+    post:
+      tags:
+        - User
+      summary: Request a password reset
+      description: >-
+        Sends a password reset email to the provided email address with a reset
+        link.
+      allOf:
+        - requestBody:
+            description: Request body for setting up a new password after account creation
+            content:
+              application/json:
+                schema:
+                  type: object
+                  properties:
+                    email:
+                      type: string
+                      format: email
+                      description: >-
+                        The email address of the user requesting a password
+                        reset.
+                      example: user@example.com
+          responses:
+            allOf:
+              - '200':
+                  description: Password reset email sent successfully.
+                  content:
+                    application/json:
+                      schema:
+                        type: object
+                        properties:
+                          message:
+                            type: string
+                            example: >-
+                              Password reset email has been sent. Please check
+                              your inbox.
+              - '400':
+                  description: >-
+                    The request could not be processed due to invalid or
+                    duplicated input, missing parameters, or mismatched data.
+                  content:
+                    application/json:
+                      schema:
+                        type: object
+                        properties:
+                          message:
+                            type: string
+                            description: A detailed message about the error.
+                            example: >-
+                              The request could not be processed due to invalid
+                              or expired input, missing parameters, or
+                              mismatched data.
                 '401':
                   description: >-
                     You are not authorized to access this resource. Please log
@@ -2100,7 +3070,8 @@ paths:
                             description: A detailed message about the error.
                             example: >-
                               The request could not be processed due to invalid
-                              input, missing parameters, or mismatched data.
+                              or expired input, missing parameters, or
+                              mismatched data.
                 '401':
                   description: >-
                     You are not authorized to access this resource. Please log
@@ -2189,7 +3160,8 @@ paths:
                             description: A detailed message about the error.
                             example: >-
                               The request could not be processed due to invalid
-                              input, missing parameters, or mismatched data.
+                              or expired input, missing parameters, or
+                              mismatched data.
                 '401':
                   description: >-
                     You are not authorized to access this resource. Please log

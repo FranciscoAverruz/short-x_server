@@ -26,6 +26,38 @@
         - $ref: './responses.yaml#/updatedPassword'
         - $ref: './responses.yaml#/commonErrors'
 
+  setupPassword:
+    requestBody:
+      $ref: './requestBodies.yaml#/setupPassword'
+    responses:
+      allOf:
+        - $ref: './responses.yaml#/updatedPassword'
+        - $ref: './responses.yaml#/commonErrors'
+  
+  requestPassword:
+    requestBody:
+      $ref: './requestBodies.yaml#/requestPassword'
+    responses:
+      allOf:
+        - $ref: './responses.yaml#/requestPassword'
+        - $ref: './responses.yaml#/commonErrors'
+
+  signup:
+    requestBody:
+      $ref: './requestBodies.yaml#/createUser'
+    responses:
+      allOf:
+        - $ref: './responses.yaml#/createUser'
+        - $ref: './responses.yaml#/commonErrors'
+
+  login:
+    requestBody:
+      $ref: './requestBodies.yaml#/login'
+    responses:
+      allOf:
+        - $ref: './responses.yaml#/login'
+        - $ref: './responses.yaml#/commonErrors'
+
   accountDeletion:
     parameters:
       - $ref: './parameters.yaml#/userIdParam'

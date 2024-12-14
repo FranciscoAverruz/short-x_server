@@ -1,16 +1,16 @@
 const Url = require("../urls/Url.model.js");
 const Click = require("../clicks/Click.model.js");
+const getPaginationParams = require("../../utils/pagination.js");
 
 async function getUserStats(req, res) {
   const userId = req.user.id;
 
-  // get pagination parameters
-  const page = parseInt(req.query.page) || 1;
-  const limit = parseInt(req.query.limit) || 10;
-  const skip = (page - 1) * limit;
+  // Obtener parámetros de paginación
+  const { page, limit, skip } = getPaginationParams(req);
 
   try {
     const totalUrls = await Url.countDocuments({ user: userId });
+
     if (totalUrls === 0) {
       return res.json({
         stats: [],
@@ -22,7 +22,8 @@ async function getUserStats(req, res) {
         },
       });
     }
-    // retrieve paginated URLs with general stats
+
+    // Obtener las URLs paginadas
     const urls = await Url.find({ user: userId })
       .skip(skip)
       .limit(limit)
@@ -30,6 +31,7 @@ async function getUserStats(req, res) {
 
     const totalPages = Math.ceil(totalUrls / limit);
 
+    // Obtener estadísticas para cada URL
     const stats = await Promise.all(
       urls.map(async (url) => {
         const totalClicks = await Click.countDocuments({ url: url._id });

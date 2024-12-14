@@ -1,6 +1,6 @@
 const express = require("express");
 const cors = require("cors");
-const dotenv = require("dotenv");
+const dotenv = require('dotenv').config();
 const app = express();
 const mongoose = require("mongoose");
 const YAML = require("yamljs");
@@ -20,8 +20,6 @@ const urlRedirect = require("./features/urls/urlRedirect.routes.js");
 const adminRoute = require("./features/admin/admin.routes.js");
 const user = require("./features/users/user.routes.js");
 const deleteAccountRoutes = require("./features/users/deleteAccount.routes.js");
-
-dotenv.config();
 
 app.use(express.json());
 app.use(cors());

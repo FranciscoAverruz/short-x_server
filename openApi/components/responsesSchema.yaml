@@ -4,7 +4,7 @@
         message:
           type: string
           description: "A detailed message about the error."
-          example: "The request could not be processed due to invalid input, missing parameters, or mismatched data."
+          example: "The request could not be processed due to invalid or expired input, missing parameters, or mismatched data."
 
     error401:
       type: object

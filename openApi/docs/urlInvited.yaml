@@ -1,7 +1,10 @@
   /invited/shortenId:
     post:
+      tags:
+        - URLs
       summary: "Shorten a URL link"
-      description: "Accepts an original URL and generates a random short URL, which expires 24 hours after its creation."
+      description: "This function allows non-registered users to shorten a URL. The shortened URL expires after 24 hours by default."
+      security: []
       requestBody:
         required: true
         content:
@@ -9,9 +12,6 @@
             schema:
               $ref: './components/schemas.yaml#/invitedPost'
       responses:
-        201:
-          description: Short URL generated successfully.
-        400:
-          $ref: './components/responses.yaml#/badRequest'
-        500:
-          $ref: './components/responses.yaml#/serverError'
+        allOf:
+          - $ref: './components/responses.yaml#/newUrlInvited'
+          - $ref: './components/responses.yaml#/commonErrors'

@@ -13,9 +13,9 @@
       summary: "Update user information by ID"
       description: "Update the details of a specific user by their ID, without modifying the password."
       allOf:
-        - $ref: './components/userDetails.yaml#/updateUser'        
+        - $ref: './components/userDetails.yaml#/updateUser'
 
-  /admin-user/{id}/password:
+  /admin-user/{id}/change-password:
     put:
       tags:
         - Administration
@@ -23,6 +23,24 @@
       description: "Change a user's password by providing the current and new passwords."
       allOf:     
         - $ref: './components/userDetails.yaml#/changePassword'
+
+  /admin-user/{id}/setup-password:
+    post:
+      tags:
+        - Administration
+      summary: "Set up a password"
+      description: "Allows users to set their password after account creation via a secure link sent by email."
+      allOf:     
+        - $ref: './components/userDetails.yaml#/setupPassword'
+  
+  /admin-user/{id}/request-newPassword:
+    post:
+      tags:
+        - Administration
+      summary: "Request a password reset"
+      description: "Sends a password reset email to the provided email address with a reset link."
+      allOf:     
+        - $ref: './components/userDetails.yaml#/requestPassword'
   
   /admin-user/{id}/request-deletion:
     post:
@@ -31,7 +49,7 @@
       summary: "Account deletion request"
       description: > 
         Allows a user to request their account deletion.
-        - **Administrators** can delete the account immediately or schedule it for deletion by specifying `deletionTimeInHours`.
+        - **Regular users** can only schedule their own account for deletion (default is 24 hours).
       allOf:
         - $ref: './components/userDetails.yaml#/accountDeletion'
   

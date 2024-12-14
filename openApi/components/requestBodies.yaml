@@ -7,6 +7,24 @@
             allOf:
             - $ref: './schemas.yaml#/user'
             - $ref: './schemas.yaml#/userCreate'
+  
+    login:
+      description: "Request body to log in"
+      required: true
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              email:
+                type: string
+                format: email
+                description: The email of the user
+                example: newEmail@example.com
+              password:
+                type: string
+                description: The user's password
+                example: newUser123
 
     userUpdate:
       description: "Datos para actualizar un usuario."
@@ -37,6 +55,26 @@
                 description: Confirmación de la nueva contraseña.
                 example: "newpassword123"
             additionalProperties: false
+            
+    setupPassword:
+      description: "Request body for setting up a new password after account creation"
+      content:
+        application/json:
+          schema:
+            $ref: './schemas.yaml#/setupPassword'
+
+    requestPassword:
+      description: "Request body for setting up a new password after account creation"
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              email:
+                type: string
+                format: email
+                description: The email address of the user requesting a password reset.
+                example: "user@example.com"
 
     URLs:
       description: "Original URL and Custom ID"

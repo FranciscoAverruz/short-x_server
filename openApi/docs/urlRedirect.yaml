@@ -1,16 +1,12 @@
   /{shortId}:
     get:
-      summary: "Redirigir a URL"
-      description: "Redirige a la URL original a partir de una URL corta."
-      operationId: urlRedirect
+      summary: Redirect to the original URL using the short ID
+      description: Finds the original URL by the provided short ID and redirects the user. Tracks the click event and handles expired or invalid URLs.
+      tags:
+        - URLs
       parameters:
-        - in: path
-          name: shortenedUrl
-          required: true
-          schema:
-            type: string
+        $ref: './components/parameters.yaml#/redirectURL'
       responses:
-        '302':
-          description: "Redirección exitosa"
-        '404':
-          description: "Enlace no encontrado"
+        allOf:
+          - $ref: './components/responses.yaml#/redirectURL'
+          - $ref: './components/responses.yaml#/commonErrors'

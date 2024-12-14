@@ -15,7 +15,7 @@
       allOf:
         - $ref: './components/userDetails.yaml#/updateUser'
 
-  /user/{id}/password:
+  /user/{id}/change-password:
     put:
       tags:
         - User
@@ -23,6 +23,24 @@
       description: "Change a user's password by providing the current and new passwords."
       allOf:     
         - $ref: './components/userDetails.yaml#/changePassword'
+
+  /user/{id}/setup-password:
+    post:
+      tags:
+        - User
+      summary: "Set up a password"
+      description: "Allows users to set their password after account creation via a secure link sent by email."
+      allOf:     
+        - $ref: './components/userDetails.yaml#/setupPassword'
+  
+  /user/{id}/request-newPassword:
+    post:
+      tags:
+        - User
+      summary: "Request a password reset"
+      description: "Sends a password reset email to the provided email address with a reset link."
+      allOf:     
+        - $ref: './components/userDetails.yaml#/requestPassword'
   
   /user/{id}/request-deletion:
     post:

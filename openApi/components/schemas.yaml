@@ -12,9 +12,13 @@
           example: newEmail@example.com
         isAdmin:
           type: boolean
-          description: Indicates whether the user has admin privileges
+          description: A flag indicating whether the user is an admin. Default is false for regular users.
           default: false
-  
+      required:
+        - username
+        - email
+        - isAdmin
+
     userCreate:
       type: object
       properties:
@@ -26,6 +30,16 @@
           type: string
           description: Confirmación de la nueva contraseña.
           example: "newpassword123"
+        urls:
+          type: array
+          description: List of URLs associated with the user. It can be empty or null if the user hasn't added any URLs yet.
+          items:
+            type: string
+            example: "https://example.com"
+          nullable: true
+          default: []
+      required:
+        - password
     
     userComplement:
       type: object
@@ -47,13 +61,42 @@
           type: string
           format: date-time
           description: The date and time when the user was last updated
+  
+    setupPassword:
+      type: object
+      properties:
+        token:
+          type: string
+          description: "The token sent to the user in the password setup email."
+        newPassword:
+          type: string
+          description: "The new password the user wants to set."
+        confirmPassword:
+          type: string
+          description: "Confirmation of the new password to ensure both passwords match."
+      required:
+        - token
+        - newPassword
+        - confirmPassword
 
     invitedPost:
       type: object
       properties:
         originalUrl:
           type: string
-          description: The original URL to shorten.
+          description: The original URL to be shortened.
+          example: "https://example.com/some/long/url"
+      required:
+        - originalUrl
+
+    expiresAt:
+      type: object
+      properties:
+        expiresAt:
+          type: string
+          format: date-time
+          description: The expiration date and time for the short URL.
+          example: "2024-06-15T12:00:00.000Z"
 
     URLs:
       type: object
@@ -61,7 +104,7 @@
         originalUrl:
           type: string
           description: Original URL.
-          example: "https://example.com"
+          example: "https://example.com/some/long/url"
         shortId:
           type: string
           description: Custom url ID.

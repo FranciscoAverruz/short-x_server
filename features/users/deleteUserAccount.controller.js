@@ -28,7 +28,6 @@ async function cancelAccountDeletion(req, res) {
     res.status(400).json({ error: err.message });
   }
 }
-
 // Permanently delete the account (after 24 hours).
 async function deleteAccount(req, res) {
   try {

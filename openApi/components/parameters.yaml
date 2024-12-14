@@ -24,3 +24,12 @@
     schema:
       type: integer
       example: 10
+
+  redirectURL:
+    name: shortId
+    in: path
+    required: true
+    description: The unique short identifier for the URL.
+    schema:
+      type: string
+      example: "abc123"
