@@ -1,6 +1,7 @@
 const Url = require('../urls/Url.model.js');
 const User = require('../users/User.model.js');
-const { nanoid } = require('nanoid');
+// const { nanoid } = require('nanoid');
+const { nanoid } = await import('nanoid');
 const { validateUrl, validateCustomIdAvailability } = require('../../utils/validateShortIds.js');
 
 // Function ti shorten the URL
