@@ -1,10 +1,8 @@
 const Url = require('../urls/Url.model.js');
-// const { nanoid } = require('nanoid');
-const { nanoid } = await import('nanoid');
+const { v4: uuidv4 } = require('uuid');
 const validator = require('validator');
 const DEFAULT_EXPIRATION_TIME = 24 * 60 * 60 * 1000;
 
-// Function to create a short URL for non-registered users.
 const shortenUrl = async (req, res) => {
   const { originalUrl } = req.body;
 
@@ -12,8 +10,8 @@ const shortenUrl = async (req, res) => {
     return res.status(400).json({ error: 'Invalid URL' });
   }
 
-  const shortId = nanoid(8);
-  const expiresAt = new Date(Date.now() + DEFAULT_EXPIRATION_TIME); // expires within 24 horas
+  const shortId = uuidv4().slice(0, 8);
+  const expiresAt = new Date(Date.now() + DEFAULT_EXPIRATION_TIME);
 
   try {
     const newUrl = await Url.create({ originalUrl, shortId, expiresAt });
