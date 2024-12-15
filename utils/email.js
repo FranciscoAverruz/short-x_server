@@ -14,13 +14,6 @@ const transporter = nodemailer.createTransport({
   },
 });
 
-/**
- * Envía un correo electrónico usando una plantilla HTML.
- * @param {string} to - Dirección de correo del destinatario.
- * @param {string} subject - Asunto del correo.
- * @param {string} templatePath - Ruta a la plantilla HTML.
- * @param {object} replacements - Objeto con valores a reemplazar en la plantilla.
- */
 async function sendEmail(to, subject, templatePath, replacements) {
   try {
     let template = fs.readFileSync(path.resolve(templatePath), "utf-8");

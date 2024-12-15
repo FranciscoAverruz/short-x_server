@@ -1,6 +1,5 @@
 const User = require("../users/User.model.js");
 const getPaginationParams = require("../../utils/pagination.js");
-// const { updatePassword } = require("../../utils/passwordUtils.js");
 
 // GET All users _______________________________________________________________
 async function retUsersAll(req, res) {
@@ -92,42 +91,8 @@ async function updateUser(req, res) {
   }
 }
 
-// // change pasword ___________________________________________________________
-// async function changePassword(req, res) {
-//   try {
-//     const { currentPassword, newPassword, confirmPassword } = req.body;
-
-//     if (newPassword !== confirmPassword) {
-//       return res.status(400).json({ message: "Mismatching password" });
-//     }
-
-//     const user = await User.findById(req.params.id);
-//     if (!user) {
-//       return res.status(404).json({ message: "User not found" });
-//     }
-
-//     const isMatch = await bcrypt.compare(currentPassword, user.password);
-//     if (!isMatch) {
-//       return res.status(400).json({ message: "Wrong current password" });
-//     }
-
-//     const salt = await bcrypt.genSalt(10);
-//     const hashedPassword = await bcrypt.hash(newPassword, salt);
-
-//     user.password = hashedPassword;
-//     await user.save();
-
-//     console.log("Password changed succesfully");
-//     res.status(200).json({ message: "Password changed succesfully" });
-//   } catch (err) {
-//     console.log("Error changing the password ", err);
-//     res.status(400).json({ error: err.message });
-//   }
-// }
-
 module.exports = {
   retUsersAll,
   retUserById,
   updateUser
-  // changePassword,
 };

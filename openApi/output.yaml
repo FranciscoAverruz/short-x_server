@@ -1,8 +1,10 @@
 openapi: 3.0.0
 info:
-  title: API de Acortador de URL
+  title: Short-X
   version: 1.0.0
-  description: Una API RESTful para gestionar URLs acortadas
+  description: |
+    This API allows shortening links and obtaining statistics for them.
+    It also provides WebSocket functionality to receive real-time updates:
 servers:
   - url: 'http://localhost:3500/api'
 tags:

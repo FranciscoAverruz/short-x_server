@@ -1,7 +1,9 @@
 const { Server } = require("socket.io");
 
+let io;
+
 const initSocket = (server) => {
-    const io = new Server(server, {
+    io = new Server(server, {
         cors: {
             origin: "*",
             methods: ["GET", "POST"],
@@ -9,18 +11,25 @@ const initSocket = (server) => {
     });
 
     io.on("connection", (socket) => {
-        console.log("Un usuario se ha conectado");
+        console.log("A user has connected.");
 
         socket.on("message", (data) => {
-            console.log("Mensaje recibido:", data);
+            console.log("Message received.", data);
         });
 
-        socket.emit("welcome", "Bienvenido al servidor de WebSockets");
+        socket.emit("Welcome to the WebSocket server.");
 
         socket.on("disconnect", () => {
-            console.log("Un usuario se ha desconectado");
+            console.log("A user has disconnected.");
         });
     });
 };
 
-module.exports = { initSocket };
+const getIo = () => {
+    if (!io) {
+        throw new Error("Socket.io has not been initialized.");
+    }
+    return io;
+};
+
+module.exports = { initSocket, getIo };

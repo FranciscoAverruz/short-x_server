@@ -8,13 +8,12 @@ const UserSchema = new mongoose.Schema({
     password: { type: String, required: true },
     isAdmin: { type: Boolean, default: false },
     urls: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Url' }],
-    // Nuevos campos para manejar la eliminación programada
-    scheduledForDeletion: { type: Date, default: null }, // Fecha en que la cuenta debe ser eliminada
-    isCancellationPending: { type: Boolean, default: false }, // Si la eliminación está pendiente de cancelación
-    cancellationRequestedAt: { type: Date, default: null }, // Fecha en la que se solicitó la cancelación
+    scheduledForDeletion: { type: Date, default: null }, 
+    isCancellationPending: { type: Boolean, default: false }, 
+    cancellationRequestedAt: { type: Date, default: null }, 
   },
   {
-    timestamps: true, // Esto agrega createdAt y updatedAt automáticamente
+    timestamps: true,
   }
 );
 
@@ -23,7 +22,7 @@ UserSchema.statics.signup = async function (username, email, isAdmin, urls, pass
   const exists = await this.findOne({email})
 
   if (exists) {
-    throw Error ('El email ya está registrado')
+    throw Error ('this email address is already registered')
   }
 
   const salt = await bcrypt.genSalt(10)

@@ -4,7 +4,7 @@ const verifyOwnership = (req, res, next) => {
   }
   return res
     .status(403)
-    .json({ message: "No tienes permiso para realizar esta acción" });
+    .json({ message: " You are not authorized to complete this action "});
 };
 
 module.exports = verifyOwnership;
