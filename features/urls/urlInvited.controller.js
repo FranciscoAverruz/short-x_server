@@ -1,5 +1,6 @@
 const Url = require('../urls/Url.model.js');
-const { nanoid } = require('nanoid');
+// const { nanoid } = require('nanoid');
+import { nanoid } from 'nanoid';
 const validator = require('validator');
 const DEFAULT_EXPIRATION_TIME = 24 * 60 * 60 * 1000;
 
