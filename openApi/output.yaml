@@ -3,7 +3,7 @@ info:
   title: Short-X
   version: 1.0.0
   description: |-
-    ## URL Shortener API with Real-Time Updates
+    ## **URL Shortener API with Real-Time Updates**
 
     **This API allows you to**:
       - Shorten `URLs` and retrieve detailed **statistics** for them.
