@@ -29,7 +29,6 @@ const openApiDocument = path.resolve(__dirname, "openApi/output.yaml");
 
 // const openApiDocument = path.resolve(__dirname, openapiPath);
 const swaggerDocument = YAML.load(openApiDocument);
-console.log("swaggerDocument ==== ", swaggerDocument);
 
 app.use("/api-docs", swaggerUI.serve, swaggerUI.setup(swaggerDocument));
 
@@ -38,7 +37,7 @@ const port = process.env.PORT || 5000;
 const mongoDB = process.env.MONGO_URI;
 
 mongoose
-  .connect(mongoDB)
+  .connect(mongoDB) 
   .then(() => {
     console.log("mongoose connected");
     const server = http.createServer(app);
@@ -50,11 +49,11 @@ mongoose
     });
     // createAdmin executed after conexion is set *********************************
     createAdmin().then(() => {
-      console.log("Script de creación de administrador ejecutado");
+      console.log("Admin creation script executed");
     });
   })
   .catch(() => {
-    console.error;
+    console.error("Error connecting to MongoDB:", error);
   });
 
 // Public Routes ******************************************************************
@@ -68,4 +67,15 @@ app.use("/api/admin-user", verifyAuth, verifyAdmin, user);
 app.use("/api/admin", verifyAdmin, adminRoute); // Admin
 
 // Account deletion through github workflow ***************************************
-app.use("/delete-account", deleteAccountRoutes);
+app.use("/", deleteAccountRoutes);
+
+process.on("SIGINT", () => {
+  console.log("Shutting down the server...");
+  server.close(() => {
+    console.log("HTTP server closed.");
+    mongoose.connection.close(() => {
+      console.log("MongoDB connection closed.");
+      process.exit(0);
+    });
+  });
+});

@@ -1,0 +1,29 @@
+name: Scheduled Account Deletion Task
+
+on:
+  schedule:
+    # Runs every day at 12:00 AM UTC
+    - cron: '0 0 * * *'
+
+jobs:
+  delete-scheduled-accounts:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v2
+
+      - name: Execute Automatic Account Deletion
+        run: |
+          response=$(curl -s -w "%{http_code}" -o /dev/null -X DELETE ${{ secrets.API_HTTP }} \
+            -H "Authorization: Bearer ${{ secrets.API_PASSWORD }}")
+          
+          if [ "$response" -eq 200 ]; then
+            echo "Scheduled accounts successfully deleted."
+          else
+            echo "Error deleting scheduled accounts. Response code: $response"
+            exit 1
+          fi
+
+      - name: Confirmation of Deletion
+        run: echo "The request for scheduled account deletion has been completed."

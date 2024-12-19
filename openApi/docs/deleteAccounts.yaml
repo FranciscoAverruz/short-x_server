@@ -1,0 +1,22 @@
+  /delete-accounts:
+    delete:
+      summary: Delete scheduled user accounts in batches
+      description: >
+        This route deletes accounts that are scheduled for deletion and have pending cancellation, based on the condition in the database:
+        (e.g., `scheduledForDeletion <= now` and `isCancellationPending = true`). The request must include a valid password in the Authorization header.
+        Processes accounts in batches of 10.
+      tags:
+        - User
+      responses:
+        allOf:
+          - 200:
+              description: Successfully deleted scheduled user accounts and associated URLs.
+              content:
+                application/json:
+                  schema:
+                    type: object
+                    properties:
+                      message:
+                        type: string
+                        example: "10 account(s) permanently deleted along with 100 associated URLs."
+          - $ref: './components/responses.yaml#/commonErrors'

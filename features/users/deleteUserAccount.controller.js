@@ -29,39 +29,52 @@ async function cancelAccountDeletion(req, res) {
   }
 }
 // Permanently delete the account (after 24 hours).
-async function deleteAccount(req, res) {
+async function deleteAccounts(req, res) {
   try {
-    const userId = req.params.id;
-    const user = await User.findById(userId);
-
-    if (!user) {
-      return res.status(404).json({ message: "User not found" });
-    }
-
+    const batchSize = 10;
     const now = new Date();
-    if (!user.isCancellationPending || user.scheduledForDeletion > now) {
-      return res.status(400).json({ message: "It is not yet time to delete the account, or the deletion has been canceled." });
+    let totalDeletedUrlsCount = 0;
+    let totalDeletedUsersCount = 0;
+
+    let usersToDelete = await User.find({
+      isCancellationPending: true,
+      scheduledForDeletion: { $lte: now },
+    }).limit(batchSize);
+
+    while (usersToDelete.length > 0) {
+      console.log(`Processing batch of ${usersToDelete.length} users...`);
+
+      for (const user of usersToDelete) {
+        let deletedUrlsCount = 0;
+        if (user.urls && user.urls.length > 0) {
+          deletedUrlsCount = await deleteUrlsInBatches([...user.urls]);
+          console.log(`Total ${deletedUrlsCount} associated URLs deleted for user ${user._id}.`);
+        }
+
+        await user.remove();
+        console.log(`User account ${user._id} deleted.`);
+
+        totalDeletedUrlsCount += deletedUrlsCount;
+        totalDeletedUsersCount++;
+      }
+
+      usersToDelete = await User.find({
+        isCancellationPending: true,
+        scheduledForDeletion: { $lte: now },
+      }).skip(totalDeletedUsersCount).limit(batchSize);
     }
 
-    // Eliminar las URLs asociadas en lotes
-    let deletedUrlsCount = 0;
-    if (user.urls && user.urls.length > 0) {
-      deletedUrlsCount = await deleteUrlsInBatches([...user.urls]); // Usar la función desde utils
-      console.log(`Total ${deletedUrlsCount} associated URLs deleted.`);
-    }
-
-    // Eliminar el usuario de la base de datos
-    await user.remove();
-    console.log("User account deleted: ", user);
-
-    res.status(200).json({ message: `Account permanently deleted along with ${deletedUrlsCount} associated URLs.` });
+    res.status(200).json({
+      message: `${totalDeletedUsersCount} account(s) permanently deleted along with ${totalDeletedUrlsCount} associated URLs.`,
+    });
   } catch (err) {
-    console.log("Error deleting the user's account:", err);
+    console.log("Error deleting the users' accounts:", err);
     res.status(500).json({ error: err.message });
   }
 }
 
+
 module.exports = {
   cancelAccountDeletion,
-  deleteAccount,
+  deleteAccounts,
 };

@@ -2,11 +2,19 @@ openapi: 3.0.0
 info:
   title: Short-X
   version: 1.0.0
-  description: |
-    This API allows shortening links and obtaining statistics for them.
-    It also provides WebSocket functionality to receive real-time updates:
+  description: |-
+    ## URL Shortener API with Real-Time Updates
+
+    **This API allows you to**:
+      - Shorten `URLs` and retrieve detailed **statistics** for them.
+      - Receive real-time updates via **WebSocket** functionality, making it easy to monitor changes to `URLs` and **user statistics** as they happen.
+
+    **Tech Stack**:
+      - Built with **Node.js**
+      - Powered by **Express**
+      - Email functionality using **Nodemailer**
 servers:
-  - url: 'http://localhost:3500/api'
+  - url: 'https://short-x.onrender.com/api'
 tags:
   - name: Authentication
     description: 'Operations related to login, registration, and URL redirection.'
@@ -1225,6 +1233,93 @@ paths:
                         example: >-
                           You have successfully logged out, please come back
                           soon.
+          - '400':
+              description: >-
+                The request could not be processed due to invalid or duplicated
+                input, missing parameters, or mismatched data.
+              content:
+                application/json:
+                  schema:
+                    type: object
+                    properties:
+                      message:
+                        type: string
+                        description: A detailed message about the error.
+                        example: >-
+                          The request could not be processed due to invalid or
+                          expired input, missing parameters, or mismatched data.
+            '401':
+              description: >-
+                You are not authorized to access this resource. Please log in
+                and try again.
+              content:
+                application/json:
+                  schema:
+                    type: object
+                    properties:
+                      message:
+                        type: string
+                        description: A detailed message about the error.
+                        example: >-
+                          You are not authorized to access this resource. Please
+                          log in and try again.
+            '404':
+              description: >-
+                The requested resource could not be found. Please check the
+                provided data and try again.
+              content:
+                application/json:
+                  schema:
+                    type: object
+                    properties:
+                      message:
+                        type: string
+                        description: A detailed message about the error.
+                        example: >-
+                          The requested resource could not be found. Please
+                          check the provided data and try again.
+            '500':
+              description: >-
+                An unexpected error occurred on the server. Please try again
+                later.
+              content:
+                application/json:
+                  schema:
+                    type: object
+                    properties:
+                      message:
+                        type: string
+                        description: A detailed message about the error.
+                        example: >-
+                          An unexpected error occurred on the server. Please try
+                          again later.
+  /delete-accounts:
+    delete:
+      summary: Delete scheduled user accounts in batches
+      description: >
+        This route deletes accounts that are scheduled for deletion and have
+        pending cancellation, based on the condition in the database: (e.g.,
+        `scheduledForDeletion <= now` and `isCancellationPending = true`). The
+        request must include a valid password in the Authorization header.
+        Processes accounts in batches of 10.
+      tags:
+        - User
+      responses:
+        allOf:
+          - '200':
+              description: >-
+                Successfully deleted scheduled user accounts and associated
+                URLs.
+              content:
+                application/json:
+                  schema:
+                    type: object
+                    properties:
+                      message:
+                        type: string
+                        example: >-
+                          10 account(s) permanently deleted along with 100
+                          associated URLs.
           - '400':
               description: >-
                 The request could not be processed due to invalid or duplicated

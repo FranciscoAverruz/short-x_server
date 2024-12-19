@@ -1,9 +1,9 @@
 // deleteAccount.routes.js
 const express = require('express');
 const router = express.Router();
-const { deleteAccount } = require('./deleteUserAccount.controller.js');
+const { deleteAccounts } = require('./deleteUserAccount.controller.js');
 const verifyDeleteAuth = require('../../middlewares/verifyDeleteAuth.js');
 
-router.delete('/:id/delete', verifyDeleteAuth, deleteAccount);
+router.delete('/delete-accounts', verifyDeleteAuth, deleteAccounts);
 
 module.exports = router;

@@ -3,7 +3,6 @@ const BlacklistedToken = require("./BlacklistedToken.js");
 const jwt = require("jsonwebtoken");
 const { sendEmail } = require("../../utils/email");
 const path = require("path");
-const verifyAdmin = require("../../middlewares/verifyAdmin.js"); // Importar el middleware
 
 async function createUser({ username, email, isAdmin, urls, password }) {
   return await User.signup(username, email, isAdmin, urls, password);
@@ -34,20 +33,18 @@ const signupUser = async (req, res) => {
   const { username, email, password, confirmPassword, urls, isAdmin } = req.body;
 
   try {
-    // 1. Verificar si el usuario es administrador, usando el middleware `verifyAdmin`
+    // 1. Verify if the user is an administrator, using the verifyAdmin middleware.
     if (req.user && req.user.isAdmin) {
-      // Si es un administrador, crea un usuario con la opción de ser administrador o no
-      const provisionalPassword = Math.random().toString(36).slice(-8);
 
-      // Si no se pasa el campo `isAdmin` en el cuerpo de la solicitud, por defecto será false
+      const provisionalPassword = Math.random().toString(36).slice(-8);
       const newUserIsAdmin = isAdmin !== undefined ? isAdmin : false;
 
       const user = await createUser({ username, email, urls, password: provisionalPassword, isAdmin: newUserIsAdmin });
 
-      // Crear un token para permitir que el usuario configure su contraseña (solo si es un administrador)
+      // Create a token to allow the user to set their password.
       const token = jwt.sign({ userId: user._id }, process.env.JWT_SECRET, { expiresIn: "24h" });
 
-      // Enviar correo para configurar la contraseña
+      // Send email to set up the password
       const templatePath = path.join(__dirname, "../templates/passwordSetupTemplate.html");
       const setupLink = `${process.env.CLIENT_URL}/setup-password?token=${token}`;
       await sendEmail(email, "Configura tu contraseña", templatePath, { username, setupLink });
@@ -58,18 +55,16 @@ const signupUser = async (req, res) => {
       });
     }
 
-    // 2. Si no es un administrador (es un usuario normal), creamos al usuario normalmente
+    // 2. If the user is not an administrator (is a regular user), create the user normally.
     if (password !== confirmPassword) {
       return res.status(400).json({ error: "Passwords do not match." });
     }
 
-    // Si no se especifica `isAdmin`, se asume que el usuario no es administrador
     const newUserIsAdmin = isAdmin !== undefined ? isAdmin : false;
     
-    // Crear el usuario para un usuario normal
     const user = await createUser({ username, email, urls, password, isAdmin: newUserIsAdmin });
 
-    // Enviar correo de confirmación de registro (para usuarios no administradores)
+    // Send registration confirmation email (for non-administrator users).
     const templatePath = path.join(__dirname, "../templates/userRegistrationTemplate.html");
     await sendEmail(email, "¡Registro Exitoso!", templatePath, { username });
 
