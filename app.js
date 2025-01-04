@@ -62,7 +62,7 @@ app.use("/api", auth);
 app.use("/", urlRedirect); // Redirection URL
 
 // Private Routes *****************************************************************
-app.use("/api/user", verifyAuth, verifyOwnership, user); // Users
+app.use("/api/user", verifyAuth, user); // Users
 app.use("/api/admin-user", verifyAuth, verifyAdmin, user);
 app.use("/api/admin", verifyAdmin, adminRoute); // Admin
 

@@ -80,7 +80,7 @@
     parameters:
       - $ref: './parameters.yaml#/userIdParam'
     requestBody:
-      $ref: './requestBodies.yaml##/URLs'
+      $ref: './requestBodies.yaml#/URLs'
     responses:
       allOf:
         - $ref: './responses.yaml#/newURL'

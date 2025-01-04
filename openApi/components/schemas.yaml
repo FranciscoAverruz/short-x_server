@@ -105,10 +105,10 @@
           type: string
           description: Original URL.
           example: "https://example.com/some/long/url"
-        shortId:
+        customId:
           type: string
           description: Custom url ID.
-          example: "CustomID"
+          example: "CustomId"
         user:
           type: string
           description: "ID of the user who owns the URL (MongoDB ObjectId)."
@@ -116,7 +116,7 @@
           nullable: true
       required:
         - originalUrl
-        - shortId
+        - customId
       additionalProperties: false
 
     click:

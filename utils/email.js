@@ -17,6 +17,7 @@ const transporter = nodemailer.createTransport({
 async function sendEmail(to, subject, templatePath, replacements) {
   try {
     let template = fs.readFileSync(path.resolve(templatePath), "utf-8");
+    console.log("Template path ///////// ", path.resolve(templatePath));
 
     for (const key in replacements) {
       template = template.replace(`{{${key}}}`, replacements[key]);

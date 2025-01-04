@@ -14,9 +14,8 @@ async function setupPassword(req, res) {
       return res.status(400).json({ message: "Mismatching password" });
     }
 
-    // Verificar el token
-    const decoded = jwt.verify(token, process.env.JWT_SECRET);
-    const user = await User.findById(decoded.userId);
+    // Aquí ya no necesitamos verificar el token, ya está en req.user gracias al middleware
+    const user = await User.findById(req.user.userId);
 
     if (!user) {
       return res.status(404).json({ message: "User not found" });
@@ -42,7 +41,8 @@ async function changePassword(req, res) {
       return res.status(400).json({ message: "Mismatching password" });
     }
 
-    const user = await User.findById(req.params.id);
+    // Usamos req.user para acceder al usuario autenticado
+    const user = await User.findById(req.user.id);
     if (!user) {
       return res.status(404).json({ message: "User not found" });
     }
@@ -78,7 +78,7 @@ async function requestPasswordReset(req, res) {
     const resetLink = `${process.env.FRONTEND_URL}/reset-password?token=${token}`;
 
     // Ruta a la plantilla HTML
-    const templatePath = "./templates/passwordResetTemplate.html";
+    const templatePath = path.join(__dirname, '..', 'templates', 'passwordResetTemplate.html');
 
     // Reemplazos para la plantilla
     const replacements = { resetLink };

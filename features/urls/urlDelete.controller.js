@@ -1,6 +1,6 @@
 const Url = require("../urls/Url.model.js");
 const User = require("../users/User.model.js");
-const validateShortIds = require("../../utils/validateShortIds.js");
+const { validateShortIds } = require("../../utils/validateShortIds.js");
 
 const MAX_DELETE_LIMIT = 10;
 
@@ -15,7 +15,7 @@ const deleteMultipleUrls = async (req, res) => {
 
   try {
     const deletedUrls = await Url.deleteMany({
-      shortId: { $in: shortIds },
+      _id: { $in: shortIds },
       user: userId,
     });
 

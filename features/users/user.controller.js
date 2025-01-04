@@ -62,16 +62,8 @@ async function retUserById(req, res) {
 async function updateUser(req, res) {
   try {
     const { password, urls, isAdmin, ...userData } = req.body;
-
-    if (isAdmin !== undefined && !req.user.isAdmin) {
-      return res
-        .status(403)
-        .json({ message: "You are not authorized to change the role." });
-    }
-
-    if (isAdmin !== undefined) {
-      userData.isAdmin = isAdmin;
-    }
+    console.log("req.body user.controller ==== ", req.body);
+    console.log("User ID user.controller ==== ", req.params.id);
 
     const updatedUser = await User.findByIdAndUpdate(
       req.params.id,
@@ -80,16 +72,17 @@ async function updateUser(req, res) {
     );
 
     if (!updatedUser) {
-      return res.status(404).json({ message: "user not found" });
+      return res.status(404).json({ message: "User not found" });
     }
 
-    console.log("User updated succesfully: ", updatedUser);
+    console.log("User updated successfully: ", updatedUser);
     res.status(200).json(updatedUser);
   } catch (err) {
     console.log("Error updating the user: ", err);
     res.status(400).json({ error: err.message });
   }
 }
+
 
 module.exports = {
   retUsersAll,
