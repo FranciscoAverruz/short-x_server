@@ -1,0 +1,108 @@
+.
+|-- Readme.md
+|-- app.js
+|-- assets
+|   `-- banner.webp
+|-- config
+|   |-- env.js
+|   |-- messages.js
+|   `-- stripe.js
+|-- estructura.txt
+|-- features
+|   |-- admin
+|   |   |-- admin.routes.js
+|   |   `-- createAdmin.controller.js
+|   |-- auth
+|   |   |-- BlacklistedToken.js
+|   |   |-- auth.controller.js
+|   |   `-- auth.routes.js
+|   |-- clicks
+|   |   |-- Click.model.js
+|   |   `-- click.controller.js
+|   |-- customDomains
+|   |   |-- CustomDomain.model.js
+|   |   |-- customDomain.controller.js
+|   |   `-- customDomain.routes.js
+|   |-- email
+|   |   |-- sendEmail.controller.js
+|   |   `-- templates
+|   |       |-- contactEmailFromWeb.html
+|   |       |-- passwordResetTemplate.html
+|   |       |-- passwordSetupTemplate.html
+|   |       `-- userRegistrationTemplate.html
+|   |-- stats
+|   |   |-- getUrlStats.controller.js
+|   |   |-- getUserStats.controller.js
+|   |   `-- stats.routes.js
+|   |-- subscriptions
+|   |   |-- Subscription.model.js
+|   |   |-- stripe.checkout.js
+|   |   |-- stripe.routes.js
+|   |   |-- stripe.service.js
+|   |   |-- stripe.webhooks.js
+|   |   |-- subscription.controller.js
+|   |   `-- subscription.routes.js
+|   |-- urls
+|   |   |-- Url.model.js
+|   |   |-- editUrlController.js
+|   |   |-- redirect.controller.js
+|   |   |-- urlDelete.controller.js
+|   |   |-- urlForUser.controller.js
+|   |   |-- urlForUser.routes.js
+|   |   |-- urlInvited.controller.js
+|   |   |-- urlInvited.routes.js
+|   |   `-- urlRedirect.routes.js
+|   `-- users
+|       |-- User.model.js
+|       |-- deleteAccount.routes.js
+|       |-- deleteUserAccount.controller.js
+|       |-- deletionRequest.controller.js
+|       |-- user.controller.js
+|       |-- user.routes.js
+|       `-- userPassword.controller.js
+|-- github
+|   `-- workflows
+|       `-- deleteAccountTask.yml
+|-- index_openapi.js
+|-- middlewares
+|   |-- checkBlacklist.js
+|   |-- verifyAdmin.js
+|   |-- verifyAuth.js
+|   |-- verifyDeleteAuth.js
+|   `-- verifyOwnership.js
+|-- openApi
+|   |-- components
+|   |   |-- parameters.yaml
+|   |   |-- requestBodies.yaml
+|   |   |-- responses.yaml
+|   |   |-- responsesSchema.yaml
+|   |   |-- schemas.yaml
+|   |   |-- security.yaml
+|   |   |-- urlUsersComponent.yaml
+|   |   `-- userDetails.yaml
+|   |-- docs
+|   |   |-- admin-user.yaml
+|   |   |-- admin.yaml
+|   |   |-- auth.yaml
+|   |   |-- deleteAccounts.yaml
+|   |   |-- stats.yaml
+|   |   |-- urlInvited.yaml
+|   |   |-- urlRedirect.yaml
+|   |   |-- urlUsers.yaml
+|   |   `-- user.yaml
+|   |-- index.yaml
+|   |-- openapi.yaml
+|   `-- output.yaml
+|-- package-lock.json
+|-- package.json
+|-- sockets
+|   `-- socket.js
+`-- utils
+    |-- createValidatedUser.js
+    |-- email.js
+    |-- pagination.js
+    |-- passwordUtils.js
+    |-- urlUtils.js
+    `-- validateShortIds.js
+
+21 directories, 84 files

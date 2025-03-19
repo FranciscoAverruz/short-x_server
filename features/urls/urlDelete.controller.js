@@ -5,6 +5,7 @@ const { validateShortIds } = require("../../utils/validateShortIds.js");
 const MAX_DELETE_LIMIT = 10;
 
 const deleteMultipleUrls = async (req, res) => {
+  console.log("DELETE request received:", req.body);
   const userId = req.user.id;
   const { shortIds } = req.body;
 
@@ -15,12 +16,14 @@ const deleteMultipleUrls = async (req, res) => {
 
   try {
     const deletedUrls = await Url.deleteMany({
-      _id: { $in: shortIds },
+      shortId: { $in: shortIds },
       user: userId,
     });
 
     if (deletedUrls.deletedCount === 0) {
-      return res.status(404).json({ error: "No URLs found or not authorized" });
+      return res
+        .status(404)
+        .json({ error: "NO_URLS", message: "No URLs found or not authorized" });
     }
 
     await User.findByIdAndUpdate(userId, {

@@ -9,7 +9,6 @@ const ClickSchema = new mongoose.Schema({
   deviceType: { type: String, enum: ["mobile", "desktop", "tablet"], default: "desktop" },
 });
 
-// Create a composite index for frequent queries involving 'url' and 'date'.
 ClickSchema.index({ url: 1, date: -1 });
 
 module.exports = mongoose.model("Click", ClickSchema);

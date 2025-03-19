@@ -1,7 +1,7 @@
 const validator = require("validator");
 const Url = require("../features/urls/Url.model.js");
 
-// validate shortIDs array before deletion
+// Validates shorIds ***************************************************************
 const validateShortIds = (shortIds, maxLimit) => {
   if (!Array.isArray(shortIds) || shortIds.length === 0) {
     return { error: "shortIds must be a non-empty array" };
@@ -14,6 +14,7 @@ const validateShortIds = (shortIds, maxLimit) => {
   return { error: null };
 };
 
+// validates URLs ******************************************************************
 const validateUrl = (url) => {
   if (!validator.isURL(url)) {
     return { error: "Invalid URL" };
@@ -21,6 +22,7 @@ const validateUrl = (url) => {
   return { error: null };
 };
 
+// validates CustomId availability *************************************************
 const validateCustomIdAvailability = async (customId) => {
   if (customId) {
     const existingUrl = await Url.findOne({ shortId: customId });

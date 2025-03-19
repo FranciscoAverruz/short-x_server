@@ -13,15 +13,35 @@ jobs:
       - name: Checkout Repository
         uses: actions/checkout@v2
 
-      - name: Execute Automatic Account Deletion
+      - name: Execute Automatic Account Deletion with Retry
         run: |
-          response=$(curl -s -w "%{http_code}" -o /dev/null -X DELETE ${{ secrets.API_HTTP }} \
-            -H "Authorization: Bearer ${{ secrets.API_PASSWORD }}")
-          
-          if [ "$response" -eq 200 ]; then
-            echo "Scheduled accounts successfully deleted."
-          else
-            echo "Error deleting scheduled accounts. Response code: $response"
+          MAX_RETRIES=3
+          RETRY_DELAY=10  # segundos
+          ATTEMPT=0
+          SUCCESS=false
+
+          while [ $ATTEMPT -lt $MAX_RETRIES ]; do
+            echo "Attempt $((ATTEMPT+1)) to delete scheduled accounts..."
+
+            response=$(curl -s -o response.json -w "%{http_code}" -X DELETE "${{ secrets.API_HTTP }}" \
+              -H "Authorization: Bearer ${{ secrets.API_PASSWORD }}")
+
+            echo "Server response code: $response"
+            cat response.json  # Muestra la respuesta completa
+
+            if [ "$response" -eq 200 ]; then
+              echo "Scheduled accounts successfully deleted."
+              SUCCESS=true
+              break
+            else
+              echo "Error deleting scheduled accounts. Retrying in $RETRY_DELAY seconds..."
+              ATTEMPT=$((ATTEMPT+1))
+              sleep $RETRY_DELAY
+            fi
+          done
+
+          if [ "$SUCCESS" = false ]; then
+            echo "Failed to delete scheduled accounts after $MAX_RETRIES attempts."
             exit 1
           fi
 

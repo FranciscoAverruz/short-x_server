@@ -1,7 +1,7 @@
 const User = require("../users/User.model.js");
 const getPaginationParams = require("../../utils/pagination.js");
 
-// GET All users _______________________________________________________________
+// GET All users **********************************************************************
 async function retUsersAll(req, res) {
   try {
     const { page, limit, skip } = getPaginationParams(req);
@@ -41,13 +41,15 @@ async function retUsersAll(req, res) {
   }
 }
 
-// GET User per ID _____________________________________________________________
+// GET User per ID ********************************************************************
 async function retUserById(req, res) {
   try {
     const userDoc = await User.findById(req.params.id);
+
     if (!userDoc) {
       return res.status(404).json({ message: "User not found" });
     }
+
     const { password, ...noPasswordUser } = userDoc.toObject();
 
     console.log("User found by ID: ", noPasswordUser);
@@ -58,7 +60,7 @@ async function retUserById(req, res) {
   }
 }
 
-// Update User _____________________________________________________________
+// Updates User ***********************************************************************
 async function updateUser(req, res) {
   try {
     const { password, urls, isAdmin, ...userData } = req.body;
@@ -75,13 +77,16 @@ async function updateUser(req, res) {
       return res.status(404).json({ message: "User not found" });
     }
 
-    console.log("User updated successfully: ", updatedUser);
-    res.status(200).json(updatedUser);
+    const { password: _, ...noPasswordUser } = updatedUser.toObject();
+
+    console.log("User updated successfully: ", noPasswordUser);
+    res.status(200).json(noPasswordUser);
   } catch (err) {
     console.log("Error updating the user: ", err);
     res.status(400).json({ error: err.message });
   }
 }
+
 
 
 module.exports = {

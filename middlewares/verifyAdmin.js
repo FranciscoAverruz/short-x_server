@@ -1,4 +1,5 @@
 const jwt = require('jsonwebtoken');
+const { JWT_SECRET } = require("../config/env")
 
 const verifyAdmin = (req, res, next) => {
 const token = req.header('Authorization')?.split(' ')[1];
@@ -8,7 +9,7 @@ if (!token) {
 }
 
 try {
-  const decoded = jwt.verify(token, process.env.JWT_SECRET);
+  const decoded = jwt.verify(token, JWT_SECRET);
   console.log('Token decodificado:', decoded); 
 
   if (!decoded.isAdmin) {

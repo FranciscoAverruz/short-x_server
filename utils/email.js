@@ -1,16 +1,16 @@
 const nodemailer = require("nodemailer");
 const fs = require("fs");
 const path = require("path");
+const { EMAIL_USER, EMAIL_PASS, NODE_ENV } = require("../config/env.js");
 
 const transporter = nodemailer.createTransport({
   service: "gmail",
   auth: {
-    user: process.env.EMAIL_USER,
-    pass: process.env.EMAIL_PASS,
+    user: EMAIL_USER,
+    pass: EMAIL_PASS,
   },
   tls: {
-    rejectUnauthorized: process.env.NODE_ENV === "production",
-    // rejectUnauthorized: false,
+    rejectUnauthorized: NODE_ENV === "production",
   },
 });
 
@@ -24,7 +24,7 @@ async function sendEmail(to, subject, templatePath, replacements) {
     }
 
     const mailOptions = {
-      from: process.env.EMAIL_USER,
+      from: EMAIL_USER,
       to,
       subject,
       html: template,
@@ -33,7 +33,7 @@ async function sendEmail(to, subject, templatePath, replacements) {
     await transporter.sendMail(mailOptions);
     console.log(`Email sent successfully to ${to}`);
   } catch (error) {
-    console.error("Error sending email:", error);
+    console.error("Error sending email:", error.response || error.message);
     throw new Error("Could not send email.");
   }
 }

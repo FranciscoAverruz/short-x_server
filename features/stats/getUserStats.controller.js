@@ -2,10 +2,10 @@ const Url = require("../urls/Url.model.js");
 const Click = require("../clicks/Click.model.js");
 const getPaginationParams = require("../../utils/pagination.js");
 const { getIo } = require("../../sockets/socket.js");
+const { FRONTEND_URL } = require("../../config/env.js")
 
 async function getUserStats(req, res) {
     const userId = req.user.id;
-
     const { page, limit, skip } = getPaginationParams(req);
 
     try {
@@ -24,19 +24,25 @@ async function getUserStats(req, res) {
         }
 
         const urls = await Url.find({ user: userId })
+            .populate("customDomain")
             .skip(skip)
             .limit(limit)
             .sort({ createdAt: -1 });
 
         const totalPages = Math.ceil(totalUrls / limit);
 
+        // generates stats for each URL
         const stats = await Promise.all(
             urls.map(async (url) => {
                 const totalClicks = await Click.countDocuments({ url: url._id });
+
                 return {
                     shortLink: url.shortId,
                     originalUrl: url.originalUrl,
                     totalClicks: totalClicks,
+                    id: url._id,
+                    expiresAt: url.expiresAt,
+                    customDomain: url.customDomain ? url.customDomain.domain : FRONTEND_URL,
                 };
             })
         );

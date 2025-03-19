@@ -1,24 +1,40 @@
+const { deleteAccounts } = require('./deleteUserAccount.controller.js');
 const User = require('./User.model');
+const Subscription = require('../subscriptions/Subscription.model.js');
 const { deleteUrlsInBatches } = require('../../utils/urlUtils.js');
 
 async function requestAccountDeletion(req, res) {
   try {
     const userId = req.params.id;
     const requester = req.user;
+    const { deletionTimeInHours, actionChoice } = req.body;
+
+    if (!userId) {
+      return res.status(400).json({ error: "InvalidRequest", message: "User ID is required." });
+    }
+
     const user = await User.findById(userId);
-    const { deletionTimeInHours } = req.body;
-
     if (!user) {
-      return res.status(404).json({ message: "User not found" });
+      return res.status(404).json({ error: "UserNotFound", message: "User not found." });
     }
 
-     if (deletionTimeInHours < 0) {
-      return res.status(400).json({ message: "Invalid deletion time." });
+    const subscription = await Subscription.findOne({ user: userId });
+    
+    if (subscription && subscription.status === "pending" && actionChoice !== "proceedImmediately") {
+      return res.status(400).json({
+        error: "CancellationPending",
+        message: "The subscription cancellation is pending. You can either wait for the cancellation or choose to delete your account immediately within 24 hours."
+      });
     }
 
+    if (deletionTimeInHours !== undefined && deletionTimeInHours < 0) {
+      return res.status(400).json({ error: "InvalidDeletionTime", message: "Deletion time must be a positive number." });
+    }
+
+    // ADMIN ************************************************************************************************
     if (requester.isAdmin) {
-      // If the administrator decides to schedule the deletion
       if (deletionTimeInHours && deletionTimeInHours > 0) {
+        // schedules account deletion
         const deletionTime = new Date();
         deletionTime.setHours(deletionTime.getHours() + deletionTimeInHours);
 
@@ -29,59 +45,65 @@ async function requestAccountDeletion(req, res) {
 
         console.log("Admin scheduled user account deletion for:", deletionTime);
 
-        // Delete the associated URLs in batches 
         let deletedUrlsCount = 0;
-        if (user.urls && user.urls.length > 0) {
+        if (Array.isArray(user.urls) && user.urls.length > 0) {
           deletedUrlsCount = await deleteUrlsInBatches([...user.urls]);
           console.log(`Total ${deletedUrlsCount} associated URLs deleted.`);
         }
 
         return res.status(200).json({
+          error: "",
           message: `Account deletion scheduled for ${deletionTime.toISOString()} along with ${deletedUrlsCount} associated URLs.`,
         });
       } else {
-        // If the administrator decides to delete the account immediately.
-        let deletedUrlsCount = 0;
-        if (user.urls && user.urls.length > 0) {
-          deletedUrlsCount = await deleteUrlsInBatches([...user.urls]); // Eliminar en lotes
-          console.log(`Total ${deletedUrlsCount} associated URLs deleted.`);
-        }
+        // Immediate account deletion
+        await deleteAccounts(req, res);
 
-        await user.remove();
-        console.log("User account immediately deleted by admin: ", user);
-
-        return res.status(200).json({ message: `Account immediately deleted by admin along with ${deletedUrlsCount} associated URLs.` });
+        return res.status(200).json({
+          error: "",
+          message: "Account immediately deleted by admin.",
+        });
       }
     }
 
-    // scheduled deletion in 24 hours for non-administrator users
-    if (user.isCancellationPending) {
-      return res.status(400).json({ message: "Account deletion is already in progress." });
-    }
-
+    // REGULAR USER - DELETION IN 24 HOURS ****************************************************************************
     const deletionTime = new Date();
-    deletionTime.setHours(deletionTime.getHours() + 24);
-
-    user.scheduledForDeletion = deletionTime;
-    user.isCancellationPending = true;
-    user.cancellationRequestedAt = new Date();
-
-    await user.save();
-
-    console.log("User account deletion scheduled for: ", user);
-
-    let deletedUrlsCount = 0;
-    if (user.urls && user.urls.length > 0) {
-      deletedUrlsCount = await deleteUrlsInBatches([...user.urls]);
-      console.log(`Total ${deletedUrlsCount} associated URLs deleted.`);
+    if (!deletionTimeInHours || deletionTimeInHours <= 0) {
+      deletionTime.setHours(deletionTime.getHours() + 24); 
+    } else {
+      deletionTime.setHours(deletionTime.getHours() + deletionTimeInHours);
     }
 
-    res.status(200).json({
-      message: `Account deletion scheduled within 24 hours along with ${deletedUrlsCount} associated URLs.`,
-    });
+    // users decides to procede with cancelation when subscription cancelation is still pending
+    if (actionChoice === "proceedImmediately") {
+      user.scheduledForDeletion = deletionTime;
+      user.isCancellationPending = true;
+      user.cancellationRequestedAt = new Date();
+      await user.save();
+
+      console.log("User account deletion scheduled for:", deletionTime);
+
+      let deletedUrlsCount = 0;
+      if (Array.isArray(user.urls) && user.urls.length > 0) {
+        deletedUrlsCount = await deleteUrlsInBatches([...user.urls]);
+        console.log(`Total ${deletedUrlsCount} associated URLs deleted.`);
+      }
+
+      return res.status(200).json({
+        error: "",
+        message: `Account deletion scheduled for ${deletionTime.toISOString()} (within the specified time).`
+      });
+    } else {
+      // Waits until susbsctiption cancelation is complete (if status pending)
+      return res.status(200).json({
+        error: "",
+        message: "You chose to wait for the cancellation of your subscription. Your account will be deleted once the subscription is cancelled."
+      });
+    }
+
   } catch (err) {
-    console.log("Failed to schedule user deletion:", err);
-    res.status(400).json({ error: err.message });
+    console.error("Error scheduling user deletion:", err);
+    return res.status(500).json({ error: "SERVER_ERROR", message: "Failed to process account deletion request." });
   }
 }
 

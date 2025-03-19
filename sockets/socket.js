@@ -1,12 +1,13 @@
 const { Server } = require("socket.io");
+const { NODE_ENV, FRONTEND_URL } = require("../config/env.js")
 
 let io;
 
 const initSocket = (server) => {
     io = new Server(server, {
         cors: {
-            origin: process.env.NODE_ENV === "production" 
-                ? "https://frontend-url.com"
+            origin: NODE_ENV === "production" 
+                ? FRONTEND_URL
                 : "*",
             methods: ["GET", "POST"],
         },

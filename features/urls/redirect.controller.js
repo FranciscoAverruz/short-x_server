@@ -1,27 +1,27 @@
-const Url = require('../urls/Url.model.js');
-const { registerClick } = require('../clicks/click.controller.js');
+const Url = require('../urls/Url.model'); 
+const CustomDomain = require('../customDomains/CustomDomain.model');
 
-// Controller for managing redirection.
 const redirectUrl = async (req, res) => {
   try {
-    const url = await Url.findOne({ shortId: req.params.shortId });
+    const shortId = req.params.shortId;
+    let url = await Url.findOne({ shortId });
 
     if (!url) {
-      return res.status(404).json({ message: 'URL no encontrada.' });
-    }
-    
-    if (url.expiresAt && new Date() > new Date(url.expiresAt)) {
-      return res.status(400).json({ message: 'La URL ha expirado.' });
+      return res.status(404).json({ message: "URL no encontrada." });
     }
 
-    await registerClick(req, res);
-        res.redirect(url.originalUrl);
+    const customDomain = await CustomDomain.findOne({ domain: req.hostname });
+
+    if (customDomain && url.customDomain) {
+      return res.redirect(url.originalUrl);
+    } else {
+      return res.redirect(url.originalUrl);
+    }
+
   } catch (error) {
     console.error(error);
-    res.status(500).json({ message: 'Error al redirigir.' });
+    return res.status(500).json({ message: "Error al redirigir." });
   }
 };
 
-module.exports = {
-  redirectUrl,
-};
+module.exports = { redirectUrl };

@@ -1944,10 +1944,10 @@ paths:
                             type: string
                             description: Original URL.
                             example: 'https://example.com/some/long/url'
-                          shortId:
+                          customId:
                             type: string
                             description: Custom url ID.
-                            example: CustomID
+                            example: CustomId
                           user:
                             type: string
                             description: >-
@@ -1957,7 +1957,7 @@ paths:
                             nullable: true
                         required:
                           - originalUrl
-                          - shortId
+                          - customId
                         additionalProperties: false
                       - type: object
                         properties:
@@ -2128,7 +2128,29 @@ paths:
                 type: string
                 example: abc123
           requestBody:
-            $ref: ./requestBodies.yaml##/URLs
+            description: Original URL and Custom ID
+            content:
+              application/json:
+                schema:
+                  type: object
+                  properties:
+                    originalUrl:
+                      type: string
+                      description: Original URL.
+                      example: 'https://example.com/some/long/url'
+                    customId:
+                      type: string
+                      description: Custom url ID.
+                      example: CustomId
+                    user:
+                      type: string
+                      description: ID of the user who owns the URL (MongoDB ObjectId).
+                      example: 60d5f3a0f8d2e87d8f0f8c9b
+                      nullable: true
+                  required:
+                    - originalUrl
+                    - customId
+                  additionalProperties: false
           responses:
             allOf:
               - '201':
@@ -2142,10 +2164,10 @@ paths:
                             type: string
                             description: Original URL.
                             example: 'https://example.com/some/long/url'
-                          shortId:
+                          customId:
                             type: string
                             description: Custom url ID.
-                            example: CustomID
+                            example: CustomId
                           user:
                             type: string
                             description: >-
@@ -2155,7 +2177,7 @@ paths:
                             nullable: true
                         required:
                           - originalUrl
-                          - shortId
+                          - customId
                         additionalProperties: false
               - '400':
                   description: >-
@@ -2234,7 +2256,29 @@ paths:
                 type: string
                 example: abc123
           requestBody:
-            $ref: ./requestBodies.yaml##/URLs
+            description: Original URL and Custom ID
+            content:
+              application/json:
+                schema:
+                  type: object
+                  properties:
+                    originalUrl:
+                      type: string
+                      description: Original URL.
+                      example: 'https://example.com/some/long/url'
+                    customId:
+                      type: string
+                      description: Custom url ID.
+                      example: CustomId
+                    user:
+                      type: string
+                      description: ID of the user who owns the URL (MongoDB ObjectId).
+                      example: 60d5f3a0f8d2e87d8f0f8c9b
+                      nullable: true
+                  required:
+                    - originalUrl
+                    - customId
+                  additionalProperties: false
           responses:
             allOf:
               - '201':
@@ -2248,10 +2292,10 @@ paths:
                             type: string
                             description: Original URL.
                             example: 'https://example.com/some/long/url'
-                          shortId:
+                          customId:
                             type: string
                             description: Custom url ID.
-                            example: CustomID
+                            example: CustomId
                           user:
                             type: string
                             description: >-
@@ -2261,7 +2305,7 @@ paths:
                             nullable: true
                         required:
                           - originalUrl
-                          - shortId
+                          - customId
                         additionalProperties: false
               - '400':
                   description: >-

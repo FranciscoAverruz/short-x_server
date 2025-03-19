@@ -1,6 +1,7 @@
-const Url = require('../urls/Url.model.js');
-const { v4: uuidv4 } = require('uuid');
-const validator = require('validator');
+const Url = require("../urls/Url.model.js");
+const { v4: uuidv4 } = require("uuid");
+const validator = require("validator");
+const { FRONTEND_URL } = require("../../config/env.js")
 const DEFAULT_EXPIRATION_TIME = 24 * 60 * 60 * 1000;
 
 const shortenUrl = async (req, res) => {
@@ -15,7 +16,15 @@ const shortenUrl = async (req, res) => {
 
   try {
     const newUrl = await Url.create({ originalUrl, shortId, expiresAt });
-    res.status(201).json(newUrl);
+    const shortUrl = `${FRONTEND_URL}/${shortId}`;
+
+    res.status(201).json({
+      originalUrl: newUrl.originalUrl,
+      shortId: shortId,
+      shortUrl: shortUrl,
+      expiresAt: newUrl.expiresAt,
+    });
+    
   } catch (err) {
     console.error('Error al crear la URL:', err);
     res.status(500).json({ error: err.message });
