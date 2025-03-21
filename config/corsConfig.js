@@ -1,42 +1,45 @@
 const cors = require("cors");
 const CustomDomain = require("../features/customDomains/CustomDomain.model");
+const { FRONTEND_URL, NODE_ENV } = require("../config/env.js")
 
-const getAllowedDomains = async () => {
+let allowedDomains = new Set();
+
+const loadAllowedDomains = async () => {
+  if (NODE_ENV !== "production") return;
+
   try {
+    console.log("Cargando dominios personalizados...");
     const customDomains = await CustomDomain.find({ verified: true });
-    const allowedDomains = customDomains.map(domain => domain.domain);
+    allowedDomains = new Set(customDomains.map(domain => domain.domain));
 
-    allowedDomains.push(process.env.CLIENT_URL);
-    allowedDomains.push('https://franciscoaverruz.netlify.app');
+    if (FRONTEND_URL) {
+      allowedDomains.add(FRONTEND_URL);
+    }
 
-    return allowedDomains;
+    console.log("Dominios permitidos:", [...allowedDomains]);
   } catch (error) {
     console.error("Error al obtener los dominios personalizados:", error);
-    return [];
   }
 };
 
-const corsOptions = async (req, res, next) => {
-  try {
-    const allowedDomains = await getAllowedDomains();
+if (NODE_ENV === "production") {
+  setInterval(loadAllowedDomains, 10 * 60 * 1000);
+  loadAllowedDomains();
+}
 
-    const corsConfig = cors({
-      origin: (origin, callback) => {
-        if (allowedDomains.indexOf(origin) !== -1 || !origin) {
-          callback(null, true);
-        } else {
-          callback(new Error("Not allowed by CORS"));
-        }
-      },
-      methods: ["GET", "POST", "PUT", "DELETE"],
-      allowedHeaders: "Content-Type, Authorization",
-    });
-
-    corsConfig(req, res, next);
-  } catch (error) {
-    console.error("Error al configurar CORS:", error);
-    next(error);
-  }
-};
+const corsOptions = cors({
+  origin: (origin, callback) => {
+    if (NODE_ENV !== "production") {
+      callback(null, true);
+    } else if (!origin || allowedDomains.has(origin)) {
+      callback(null, true);
+    } else {
+      callback(new Error("Not allowed by CORS"));
+    }
+  },
+  credentials: true,
+  methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+  allowedHeaders: ["Content-Type", "Authorization"],
+});
 
 module.exports = corsOptions;
