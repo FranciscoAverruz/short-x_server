@@ -23,24 +23,14 @@ const urlRedirect = require("./features/urls/urlRedirect.routes.js");
 const stripeRoutes = require("./features/subscriptions/stripe.routes.js");
 const subscriptionRoutes = require("./features/subscriptions/subscription.routes.js");
 const deleteAccountRoutes = require("./features/users/deleteAccount.routes.js");
-// const corsOptions = require("./config/corsConfig.js"); // Importamos el middleware de CORS
+const corsOptions = require("./config/corsConfig.js"); // Importamos el middleware de CORS
 // const customDomainRoutes = require("./features/customDomains/customDomain.routes.js");
 
 const stripe = require("./config/stripe");
 
 app.use(express.json());
 
-// app.use(corsOptions);
-
-app.use(
-  cors({
-    origin:
-      process.env.NODE_ENV === "production" ? process.env.FRONTEND_URL : "*",
-    methods: ["GET", "POST", "PUT", "DELETE"],
-    allowedHeaders: "Content-Type, Authorization",
-  })
-);
-
+app.use(corsOptions);
 // *** SWAGGER IMPLEMENTATION *****************************************************
 const openApiDocument = path.resolve(__dirname, "openApi/output.yaml");
 const swaggerDocument = YAML.load(openApiDocument);
