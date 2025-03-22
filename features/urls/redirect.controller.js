@@ -1,13 +1,12 @@
 const Url = require('../urls/Url.model'); 
-const CustomDomain = require('../customDomains/CustomDomain.model');
 
 const redirectUrl = async (req, res) => {
   try {
     const shortId = req.params.shortId;
-    const requestHost = req.hostname;
+    const requestOrigin = req.get('origin');
 
     console.log("<<--------- shortId --------->>", shortId)
-    console.log("<<--------- requestHost ----->>", requestHost)
+    console.log("<<--------- requestOrigin ----->>", requestOrigin)
 
     let url = await Url.findOne({ shortId }).populate("customDomain");
 
@@ -16,7 +15,7 @@ const redirectUrl = async (req, res) => {
     }
 
     if (url.customDomain) {
-      if (url.customDomain.domain === requestHost) {
+      if (url.customDomain.domain === requestOrigin) {
         return res.redirect(301, url.originalUrl);
       } else {
         return res.status(403).json({ message: "Este dominio no tiene permiso para redirigir esta URL." });
