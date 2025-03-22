@@ -1,6 +1,6 @@
 const cors = require("cors");
+const { NODE_ENV, FRONTEND_URL } = require("../config/env.js");
 const CustomDomain = require("../features/customDomains/CustomDomain.model");
-const { FRONTEND_URL, NODE_ENV } = require("../config/env.js");
 
 let allowedDomains = new Set();
 
@@ -9,6 +9,7 @@ const loadAllowedDomains = async () => {
 
   try {
     console.log("Cargando dominios personalizados...");
+
     const customDomains = await CustomDomain.find({ verified: true });
     allowedDomains = new Set(customDomains.map(domain => domain.domain));
 
@@ -31,14 +32,12 @@ const corsOptions = cors({
   origin: (origin, callback) => {
     if (NODE_ENV === "development") {
       callback(null, true);
-    } else if (NODE_ENV === "production") {
+    } else {
       if (!origin || allowedDomains.has(origin)) {
         callback(null, true);
       } else {
         callback(new Error("Not allowed by CORS"));
       }
-    } else {
-      callback(null, true);
     }
   },
   credentials: true,
