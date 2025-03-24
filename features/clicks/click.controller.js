@@ -53,7 +53,7 @@ async function registerClick(req, res) {
 
     const newClick = new Click(clickData);
     await newClick.save();
-    console.log("✅ Click successfully registered");
+    console.log("Click successfully registered");
 
   } catch (err) {
     console.error("Error saving click:", err);

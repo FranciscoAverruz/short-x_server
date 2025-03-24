@@ -22,6 +22,15 @@ const loadAllowedDomainsIfNeeded = async () => {
   }
 };
 
+const handleOptions = (req, res, next) => {
+  res.setHeader('Access-Control-Allow-Origin', '*');
+  res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS, PUT, DELETE');
+  res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization, X-Requested-With');
+  res.setHeader('Access-Control-Allow-Credentials', 'true');
+
+  res.status(204).send('');
+};
+
 const corsOptions = async (req, callback) => {
   await loadAllowedDomainsIfNeeded();
 
@@ -29,6 +38,15 @@ const corsOptions = async (req, callback) => {
 
   const allowedMethods = ['GET', 'POST', 'OPTIONS', 'PUT', 'DELETE'];
   const allowedHeaders = ['Content-Type', 'Authorization', 'X-Requested-With'];
+
+  if (req.method === 'OPTIONS') {
+    return callback(null, {
+      origin: true,
+      methods: allowedMethods,
+      allowedHeaders: allowedHeaders,
+      credentials: true
+    });
+  }
 
   if (NODE_ENV === "development" || !origin || allowedDomains.has(origin) || origin.includes("localhost")) {
     return callback(null, {
@@ -42,4 +60,4 @@ const corsOptions = async (req, callback) => {
   return callback(new Error("Not allowed by CORS"));
 };
 
-module.exports = cors(corsOptions);
+module.exports = { corsOptions, handleOptions };
