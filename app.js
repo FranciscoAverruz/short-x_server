@@ -25,12 +25,15 @@ const subscriptionRoutes = require("./features/subscriptions/subscription.routes
 const deleteAccountRoutes = require("./features/users/deleteAccount.routes.js");
 const corsOptions = require("./config/corsConfig.js");
 // const customDomainRoutes = require("./features/customDomains/customDomain.routes.js");
-
 const stripe = require("./config/stripe");
+app.use(corsOptions);
 
 app.use(express.json());
 
-app.use(corsOptions);
+// app.use((req, res, next) => {
+//   console.log(`Solicitud recibida: ${req.method} ${req.originalUrl}`);
+//   next();  // Esto asegura que la solicitud sigue su flujo hacia el siguiente middleware o controlador
+// });
 
 // *** SWAGGER IMPLEMENTATION *****************************************************
 const openApiDocument = path.resolve(__dirname, "openApi/output.yaml");

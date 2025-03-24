@@ -11,7 +11,9 @@ const checkBlacklist = async (req, res, next) => {
     const blacklistedToken = await BlacklistedToken.findOne({ token });
 
     if (blacklistedToken) {
-      return res.status(401).json({ error: "Token has been invalidated (logged out)" });
+      return res
+        .status(401)
+        .json({ error: "Token has been invalidated (logged out)" });
     }
 
     next();

@@ -12,8 +12,6 @@ const sendVerificationEmail = async (userEmail, domain, verificationToken, verif
     },
   });
 
-  // const verificationLink = `https://st-x.netlify.app/verify-domain?token=${verificationToken}&domain=${domain}`;
-
   const emailHtml = `
   <!DOCTYPE html>
   <html lang="es">

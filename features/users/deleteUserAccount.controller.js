@@ -1,5 +1,5 @@
-const User = require('./User.model.js');
-const { deleteUrlsInBatches } = require('../../utils/urlUtils.js');
+const User = require("./User.model.js");
+const { deleteUrlsInBatches } = require("../../utils/urlUtils.js");
 
 // Cancels account deletion before the 24 hours expiration ************************
 async function cancelAccountDeletion(req, res) {
@@ -12,7 +12,9 @@ async function cancelAccountDeletion(req, res) {
     }
 
     if (!user.isCancellationPending) {
-      return res.status(400).json({ message: "No scheduled deletion for this user." });
+      return res
+        .status(400)
+        .json({ message: "No scheduled deletion for this user." });
     }
 
     user.scheduledForDeletion = null;
@@ -21,10 +23,8 @@ async function cancelAccountDeletion(req, res) {
 
     await user.save();
 
-    console.log("Deletion canceled for the user: ", user);
     res.status(200).json({ message: "Deletion canceled successfully." });
   } catch (err) {
-    console.log("Error canceling the user's account deletion:", err);
     res.status(400).json({ error: err.message });
   }
 }
@@ -39,29 +39,31 @@ async function deleteAccounts(req, res) {
     let usersToDelete = await User.find({
       isCancellationPending: true,
       scheduledForDeletion: { $lte: now },
-    }).populate("subscription").limit(batchSize);
+    })
+      .populate("subscription")
+      .limit(batchSize);
 
     while (usersToDelete.length > 0) {
-      console.log(`Processing batch of ${usersToDelete.length} users...`);
-
       for (const user of usersToDelete) {
         let deletedUrlsCount = 0;
 
         // Handles subscription cancellation if it exists
         if (user.subscription && user.subscription.status !== "cancelled") {
           try {
-            console.log(`Cancelando suscripción de usuario ${user._id}...`);
-            await stripe.subscriptions.del(user.subscription.stripeSubscriptionId);
+            await stripe.subscriptions.del(
+              user.subscription.stripeSubscriptionId
+            );
 
             await Subscription.findByIdAndUpdate(user.subscription._id, {
               status: "cancelled",
               stripeSubscriptionId: null,
               cancellationDate: now,
             });
-
-            console.log(`Suscripción de usuario ${user._id} cancelada.`);
           } catch (error) {
-            console.error(`Error cancelando suscripción de usuario ${user._id}:`, error);
+            console.error(
+              `Error cancelando suscripción de usuario ${user._id}:`,
+              error
+            );
             continue;
           }
         }
@@ -69,12 +71,10 @@ async function deleteAccounts(req, res) {
         // Deletes associated URLs
         if (user.urls && user.urls.length > 0) {
           deletedUrlsCount = await deleteUrlsInBatches([...user.urls]);
-          console.log(`Total ${deletedUrlsCount} associated URLs deleted for user ${user._id}.`);
         }
 
         // Deletes user after subscription cancelation
         await user.remove();
-        console.log(`User account ${user._id} deleted.`);
 
         totalDeletedUrlsCount += deletedUrlsCount;
         totalDeletedUsersCount++;
@@ -83,14 +83,16 @@ async function deleteAccounts(req, res) {
       usersToDelete = await User.find({
         isCancellationPending: true,
         scheduledForDeletion: { $lte: now },
-      }).populate("subscription").skip(totalDeletedUsersCount).limit(batchSize);
+      })
+        .populate("subscription")
+        .skip(totalDeletedUsersCount)
+        .limit(batchSize);
     }
 
     res.status(200).json({
       message: `${totalDeletedUsersCount} account(s) permanently deleted along with ${totalDeletedUrlsCount} associated URLs.`,
     });
   } catch (err) {
-    console.log("Error deleting the users' accounts:", err);
     res.status(500).json({ error: err.message });
   }
 }

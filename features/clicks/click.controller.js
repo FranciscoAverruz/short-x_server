@@ -4,17 +4,23 @@ const Click = require("../clicks/Click.model.js");
 const Url = require("../urls/Url.model.js");
 
 async function registerClick(req, res) {
+  console.log("<<<--------- Iniciando registro de click --------->>>")
   const shortId = req.params.shortId;
   const userAgent = req.headers["user-agent"];
   const ip = req.headers["x-forwarded-for"] || req.connection.remoteAddress;
   const ipToCheck = (ip === "::1" || ip === "127.0.0.1") ? "8.8.8.8" : ip;
+
+ console.log("<<<--------- shortId --------->>>", shortId)
+ console.log("<<<--------- userAgent ------->>>", userAgent)
+ console.log("<<<--------- ip -------------->>>", ip)
+ console.log("<<<--------- ipToCheck ------->>>", ipToCheck)
+
 
   const md = new MobileDetect(userAgent);
   const isMobile = md.mobile() !== null;
 
   let location = req.body.location;
 
-  // Tries to fetch location if it's not provided
   if (!location) {
     try {
       const response = await axios.get(`https://ipapi.co/${ipToCheck}/json/`);
@@ -31,14 +37,10 @@ async function registerClick(req, res) {
   }
 
   try {
-    // Finds URL by shortId
     const url = await Url.findOne({ shortId });
 
     if (!url) {
-      return res.status(404).json({
-        error: "URL_NOT_FOUND",
-        message: "The short URL was not found in the database.",
-      });
+      console.error("no hay URL:");
     }
 
     const clickData = {
@@ -49,18 +51,12 @@ async function registerClick(req, res) {
       deviceType: isMobile ? "mobile" : "desktop",
     };
 
-    // Creates a new Click entry
     const newClick = new Click(clickData);
     await newClick.save();
     console.log("✅ Click successfully registered");
 
   } catch (err) {
     console.error("Error saving click:", err);
-
-    return res.status(500).json({
-      error: "SERVER_ERROR",
-      message: "An error occurred while saving the click. Please try again later.",
-    });
   }
 }
 

@@ -5,6 +5,8 @@ const updateUrl = async (req, res) => {
   try {
     const { originalUrl, shortId, customDomain, id } = req.body;
 
+    let domainToUpdate = customDomain
+
     if (!mongoose.Types.ObjectId.isValid(id)) {
       return res.status(400).json({
         errorCode: "INVALID_ID",
@@ -12,9 +14,13 @@ const updateUrl = async (req, res) => {
       });
     }
 
+    if (!mongoose.Types.ObjectId.isValid(customDomain)) {
+      domainToUpdate= null
+    }
+
     const existingUrl = await Url.findOne({
       shortId,
-      customDomain: customDomain || null,
+      customDomain: domainToUpdate,
       _id: { $ne: id },
     });
 
@@ -27,7 +33,7 @@ const updateUrl = async (req, res) => {
 
     const updatedUrl = await Url.findByIdAndUpdate(
       id,
-      { originalUrl, shortId, customDomain },
+      { originalUrl, shortId, customDomain: domainToUpdate },
       { new: true, runValidators: true }
     );
 
@@ -38,7 +44,6 @@ const updateUrl = async (req, res) => {
       });
     }
 
-    console.log("URL actualizada con éxito:", updatedUrl);
     res.json(updatedUrl);
   } catch (error) {
     console.error("Error en updateUrl:", error);

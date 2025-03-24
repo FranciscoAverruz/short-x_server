@@ -5,7 +5,6 @@ const { validateShortIds } = require("../../utils/validateShortIds.js");
 const MAX_DELETE_LIMIT = 10;
 
 const deleteMultipleUrls = async (req, res) => {
-  console.log("DELETE request received:", req.body);
   const userId = req.user.id;
   const { shortIds } = req.body;
 

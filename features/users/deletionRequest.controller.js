@@ -43,12 +43,9 @@ async function requestAccountDeletion(req, res) {
         user.cancellationRequestedAt = new Date();
         await user.save();
 
-        console.log("Admin scheduled user account deletion for:", deletionTime);
-
         let deletedUrlsCount = 0;
         if (Array.isArray(user.urls) && user.urls.length > 0) {
           deletedUrlsCount = await deleteUrlsInBatches([...user.urls]);
-          console.log(`Total ${deletedUrlsCount} associated URLs deleted.`);
         }
 
         return res.status(200).json({
@@ -80,8 +77,6 @@ async function requestAccountDeletion(req, res) {
       user.isCancellationPending = true;
       user.cancellationRequestedAt = new Date();
       await user.save();
-
-      console.log("User account deletion scheduled for:", deletionTime);
 
       let deletedUrlsCount = 0;
       if (Array.isArray(user.urls) && user.urls.length > 0) {

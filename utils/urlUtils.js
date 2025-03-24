@@ -10,8 +10,6 @@ async function deleteUrlsInBatches(urlIds) {
     const batch = urlIds.splice(0, BATCH_SIZE);
     const result = await Url.deleteMany({ _id: { $in: batch } });
     totalDeleted += result.deletedCount;
-
-    console.log(`Deleted ${result.deletedCount} URLs. ${totalUrls - totalDeleted} remaining.`);
   }
 
   return totalDeleted;
