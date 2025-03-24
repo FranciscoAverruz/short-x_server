@@ -4,7 +4,6 @@ console.log("<<<-------- antes de redirección... -------->>>");
 let clickCounter = {};
 
 const redirectUrl = async (req, res) => {
-
   try {
     const shortId = req.params.shortId;
 
@@ -33,14 +32,15 @@ const redirectUrl = async (req, res) => {
       const customDomainBase = new URL(url.customDomain.domain).hostname;
       const requestBaseDomain = requestOrigin ? new URL(requestOrigin).hostname : null;
       if (!requestBaseDomain) {
-           return res.redirect(301, url.originalUrl);
+           return res.redirect(302, url.originalUrl);
       }
 
       if (customDomainBase !== requestBaseDomain) {
         return res.status(403).json({ message: "Este dominio no tiene permiso para redirigir esta URL." });
       }
     }
-    return res.redirect(301, url.originalUrl);
+    console.log(`<<<-------- Redirigiendo a: ${url.originalUrl} -------->>>`);
+    return res.redirect(302, url.originalUrl);
 
   } catch (error) {
     return res.status(500).json({ message: "Error al redirigir." });
