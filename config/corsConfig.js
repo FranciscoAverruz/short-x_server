@@ -1,6 +1,6 @@
-const cors = require("cors");
-const CustomDomain = require("../features/customDomains/CustomDomain.model");
-const { FRONTEND_URL, NODE_ENV } = require("../config/env.js");
+const cors = require('cors');
+const CustomDomain = require('../features/customDomains/CustomDomain.model');
+const { FRONTEND_URL, NODE_ENV } = require('../config/env.js');
 
 let allowedDomains = new Set();
 let lastUpdate = 0;
@@ -14,7 +14,7 @@ const loadAllowedDomainsIfNeeded = async () => {
     allowedDomains = new Set(customDomains.map(domain => domain.domain));
 
     if (FRONTEND_URL) allowedDomains.add(FRONTEND_URL);
-    console.log("<<<<------- allowedDomains ------->>>>", allowedDomains)
+    console.log("<<<<------- allowedDomains ------->>>>", allowedDomains);
 
     lastUpdate = Date.now();
   } catch (error) {
@@ -27,10 +27,15 @@ const corsOptions = async (req, callback) => {
 
   const origin = req.header("Origin");
 
-  if (NODE_ENV === "development" || !origin || allowedDomains.has(origin)) {
+  const allowedMethods = ['GET', 'POST', 'OPTIONS', 'PUT', 'DELETE'];
+  const allowedHeaders = ['Content-Type', 'Authorization', 'X-Requested-With'];
+
+  if (NODE_ENV === "development" || !origin || allowedDomains.has(origin) || origin.includes("localhost")) {
     return callback(null, {
       origin: true,
       credentials: true,
+      methods: allowedMethods,
+      allowedHeaders: allowedHeaders,
     });
   }
 
