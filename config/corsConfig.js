@@ -24,14 +24,8 @@ const loadAllowedDomainsIfNeeded = async () => {
 // OPTIONS requests (preflight) handling
 const handleOptions = (req, res, next) => {
   res.setHeader("Access-Control-Allow-Origin", "*");
-  res.setHeader(
-    "Access-Control-Allow-Methods",
-    "GET, POST, OPTIONS, PUT, DELETE"
-  );
-  res.setHeader(
-    "Access-Control-Allow-Headers",
-    "Content-Type, Authorization, X-Requested-With"
-  );
+  res.setHeader("Access-Control-Allow-Methods", "GET, POST, OPTIONS, PUT, DELETE");
+  res.setHeader("Access-Control-Allow-Headers", "Content-Type, Authorization, X-Requested-With");
   res.setHeader("Access-Control-Allow-Credentials", "true");
 
   res.status(204).send("");
@@ -40,8 +34,6 @@ const handleOptions = (req, res, next) => {
 // CORS configuration for regular requests and OPTIONS
 const corsOptions = async (req, callback) => {
   await loadAllowedDomainsIfNeeded();
-
-  const origin = req.header("Origin");
 
   const allowedMethods = ["GET", "POST", "OPTIONS", "PUT", "DELETE"];
   const allowedHeaders = ["Content-Type", "Authorization", "X-Requested-With"];
@@ -58,12 +50,13 @@ const corsOptions = async (req, callback) => {
 
   if (
     NODE_ENV === "development" ||
-    !origin ||
+    !req.header("Origin") ||
+    // !origin 
     allowedDomains.has(origin) ||
     origin.includes("localhost")
   ) {
     return callback(null, {
-      origin: true,
+      origin: req.header("Origin"),
       credentials: true,
       methods: allowedMethods,
       allowedHeaders: allowedHeaders,
