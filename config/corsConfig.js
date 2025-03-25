@@ -14,6 +14,8 @@ const loadAllowedDomainsIfNeeded = async () => {
     allowedDomains = new Set(customDomains.map((domain) => domain.domain));
     if (FRONTEND_URL) allowedDomains.add(FRONTEND_URL);
 
+    console.log("<<<<--------- allowedDomains --------->>>>", allowedDomains)
+
     lastUpdate = Date.now();
   } catch (error) {
     console.error("Error al obtener dominios personalizados:", error);

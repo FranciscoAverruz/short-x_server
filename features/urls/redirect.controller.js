@@ -3,8 +3,13 @@ const Url = require("../urls/Url.model");
 
 const redirectUrl = async (req, res) => {
   try {
+    console.log("<<<<------- Headers recibidos: ------->>>>", req.headers);
+
     const shortId = req.params.shortId;
-    let requestOrigin = req.get("origin") || req.get("referer") || null;
+    const protocol = req.protocol;
+    const host = req.headers.host;
+    // let requestOrigin = req.get("origin") || req.get("referer") || null;
+    let requestOrigin = req.get("origin") || req.get("referer") || `${protocol}://${host}`;
     console.log("<<<<------------ requestOrigin ------------>>>>", requestOrigin)
 
     res.set("Cache-Control", "no-store, no-cache, must-revalidate, proxy-revalidate");
@@ -31,6 +36,9 @@ const redirectUrl = async (req, res) => {
       if (!requestBaseDomain) {
         return res.redirect(302, url.originalUrl);
       }
+
+      console.log("****** Custom Domain Base:", customDomainBase);
+      console.log("****** Request Base Domain:", requestBaseDomain);
 
       if (customDomainBase !== requestBaseDomain) {
         return res
