@@ -1,11 +1,11 @@
 const CustomDomain = require("../customDomains/CustomDomain.model.js"); 
 const User = require("../users/User.model.js"); 
 const crypto = require("crypto");
-const { sendEmail } = require("../../utils/email.js"); // ../utils/sendEmail.js
+const { sendEmail } = require("../../utils/email.js");
 const { FRONTEND_URL } = require("../../config/env.js")
 const path = require("path");
 
-// Adds a nes custom domain  ****************************************************
+// Adds a new custom domain  ****************************************************
 const addCustomDomain = async (req, res) => {
   try {
     const { domain } = req.body;

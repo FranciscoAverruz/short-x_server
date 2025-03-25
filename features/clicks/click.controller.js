@@ -4,17 +4,10 @@ const Click = require("../clicks/Click.model.js");
 const Url = require("../urls/Url.model.js");
 
 async function registerClick(req, res) {
-  console.log("<<<--------- Iniciando registro de click --------->>>")
   const shortId = req.params.shortId;
   const userAgent = req.headers["user-agent"];
   const ip = req.headers["x-forwarded-for"] || req.connection.remoteAddress;
-  const ipToCheck = (ip === "::1" || ip === "127.0.0.1") ? "8.8.8.8" : ip;
-
- console.log("<<<--------- shortId --------->>>", shortId)
- console.log("<<<--------- userAgent ------->>>", userAgent)
- console.log("<<<--------- ip -------------->>>", ip)
- console.log("<<<--------- ipToCheck ------->>>", ipToCheck)
-
+  const ipToCheck = ip === "::1" || ip === "127.0.0.1" ? "8.8.8.8" : ip;
 
   const md = new MobileDetect(userAgent);
   const isMobile = md.mobile() !== null;
@@ -31,7 +24,7 @@ async function registerClick(req, res) {
         location = "Location not found";
       }
     } catch (err) {
-      console.error("Error fetching location:", err);
+      console.error("Error fetching location:");
       location = "Location not found";
     }
   }
@@ -41,6 +34,7 @@ async function registerClick(req, res) {
 
     if (!url) {
       console.error("no hay URL:");
+      return res.status(404).json({ message: "URL no encontrada" });
     }
 
     const clickData = {
@@ -53,10 +47,11 @@ async function registerClick(req, res) {
 
     const newClick = new Click(clickData);
     await newClick.save();
-    console.log("Click successfully registered");
 
+    return res.status(200).json({ message: "Click registrado exitosamente" });
   } catch (err) {
     console.error("Error saving click:", err);
+    return res.status(500).json({ message: "Error al registrar el clic" });
   }
 }
 
