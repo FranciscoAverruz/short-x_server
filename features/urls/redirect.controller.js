@@ -28,7 +28,7 @@ const redirectUrl = async (req, res) => {
         ? new URL(requestOrigin).hostname
         : null;
       if (!requestBaseDomain) {
-        return res.redirect(302, url.originalUrl);
+        return res.redirect(200, url.originalUrl);
       }
 
       if (customDomainBase !== requestBaseDomain) {
@@ -39,7 +39,7 @@ const redirectUrl = async (req, res) => {
           });
       }
     }
-    return res.redirect(302, url.originalUrl);
+    return res.redirect(200, url.originalUrl);
   } catch (error) {
     return res.status(500).json({ message: "Error al redirigir." });
   }

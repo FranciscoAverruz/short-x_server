@@ -9,6 +9,12 @@ async function registerClick(req, res) {
   const ip = req.headers["x-forwarded-for"] || req.connection.remoteAddress;
   const ipToCheck = ip === "::1" || ip === "127.0.0.1" ? "8.8.8.8" : ip;
 
+
+  console.log("Registrando clic...");
+  console.log("shortId:", shortId);
+  console.log("IP:", ip);
+  console.log("User-Agent:", userAgent);
+
   const md = new MobileDetect(userAgent);
   const isMobile = md.mobile() !== null;
 

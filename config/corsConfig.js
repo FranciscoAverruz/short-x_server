@@ -12,7 +12,6 @@ const loadAllowedDomainsIfNeeded = async () => {
   try {
     const customDomains = await CustomDomain.find({ verified: true });
     allowedDomains = new Set(customDomains.map((domain) => domain.domain));
-
     if (FRONTEND_URL) allowedDomains.add(FRONTEND_URL);
 
     lastUpdate = Date.now();
@@ -35,6 +34,8 @@ const handleOptions = (req, res, next) => {
 const corsOptions = async (req, callback) => {
   await loadAllowedDomainsIfNeeded();
 
+  const origin = req.header("Origin");
+
   const allowedMethods = ["GET", "POST", "OPTIONS", "PUT", "DELETE"];
   const allowedHeaders = ["Content-Type", "Authorization", "X-Requested-With"];
 
@@ -50,13 +51,12 @@ const corsOptions = async (req, callback) => {
 
   if (
     NODE_ENV === "development" ||
-    !req.header("Origin") ||
-    // !origin 
+    !origin ||
     allowedDomains.has(origin) ||
     origin.includes("localhost")
   ) {
     return callback(null, {
-      origin: req.header("Origin"),
+      origin: true,
       credentials: true,
       methods: allowedMethods,
       allowedHeaders: allowedHeaders,
