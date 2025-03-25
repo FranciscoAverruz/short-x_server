@@ -1,15 +1,16 @@
 const Url = require("../urls/Url.model");
-const {BACKEND_URL} = require("../../config/env.js")
 
 const redirectUrl = async (req, res) => {
   try {
     const shortId = req.params.shortId;
-    const protocol = req.protocol;
-    const host = req.headers.host;
 
-    let requestOrigin = req.get("origin") || req.get("referer") || `${protocol}://${host}`;
+    const fullRequestUrl = `${req.protocol}://${req.headers.host}${req.originalUrl}`;
+    console.log("<<<<------------ Full Request URL ------------>>>>", fullRequestUrl);
+
+    let requestOrigin = req.get("origin") || req.get("referer") || fullRequestUrl;
     console.log("<<<<------------ requestOrigin ------------>>>>", requestOrigin);
 
+    // Configuración de caché
     res.set("Cache-Control", "no-store, no-cache, must-revalidate, proxy-revalidate");
     res.set("Pragma", "no-cache");
     res.set("Expires", "0");
@@ -21,10 +22,11 @@ const redirectUrl = async (req, res) => {
       return res.status(404).json({ message: "URL no encontrada." });
     }
 
+    // Validación de Custom Domain
     if (url.customDomain) {
       const customDomainBase = new URL(url.customDomain.domain).hostname;
       const requestBaseDomain = requestOrigin ? new URL(requestOrigin).hostname : null;
-      const backendBaseDomain = new URL(BACKEND_URL).hostname;
+      const backendBaseDomain = new URL(process.env.BACKEND_URL).hostname;
 
       console.log("****** Custom Domain Base:", customDomainBase);
       console.log("****** Request Base Domain:", requestBaseDomain);
