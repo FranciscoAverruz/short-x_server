@@ -7,8 +7,17 @@ async function registerClick(req) {
   try {
     const shortId = req.params.shortId;
     const userAgent = req.headers["user-agent"];
-    const ip = req.headers["x-forwarded-for"] || req.connection.remoteAddress;
-    const ipToCheck = ip === "::1" || ip === "127.0.0.1" ? "8.8.8.8" : ip;
+    let ip = req.headers["x-forwarded-for"];
+    if (ip) {
+      ip = ip.split(",")[0];
+    } else {
+      ip = req.connection.remoteAddress;
+    }
+
+    if (ip === "127.0.0.1" || ip === "::1") {
+      ip = "8.8.8.8";
+    }
+    
 
     console.log("Registrando clic...");
     console.log("shortId:", shortId);
@@ -22,7 +31,7 @@ async function registerClick(req) {
 
     if (!location) {
       try {
-        const response = await axios.get(`https://ipapi.co/${ipToCheck}/json/`);
+        const response = await axios.get(`https://ipapi.co/${ip}/json/`);
 
         if (response.data?.city && response.data?.country_name) {
           location = `${response.data.city}, ${response.data.country_name}`;
