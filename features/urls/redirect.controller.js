@@ -5,6 +5,7 @@ const redirectUrl = async (req, res) => {
   try {
     const shortId = req.params.shortId;
     let requestOrigin = req.get("origin") || req.get("referer") || null;
+    console.log("<<<<------------ requestOrigin ------------>>>>", requestOrigin)
 
     res.set("Cache-Control", "no-store, no-cache, must-revalidate, proxy-revalidate");
     res.set("Pragma", "no-cache");
@@ -28,7 +29,7 @@ const redirectUrl = async (req, res) => {
         ? new URL(requestOrigin).hostname
         : null;
       if (!requestBaseDomain) {
-        return res.redirect(200, url.originalUrl);
+        return res.redirect(302, url.originalUrl);
       }
 
       if (customDomainBase !== requestBaseDomain) {
@@ -39,7 +40,7 @@ const redirectUrl = async (req, res) => {
           });
       }
     }
-    return res.redirect(200, url.originalUrl);
+    return res.redirect(302, url.originalUrl);
   } catch (error) {
     return res.status(500).json({ message: "Error al redirigir." });
   }

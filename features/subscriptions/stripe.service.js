@@ -79,12 +79,15 @@ const updateStripeSubscription = async (userId, newPlan) => {
     throw new Error('Plan no válido');
   }
 
-  if (mongoose.isValidObjectId(userId)) {
-    const userObjectId = mongoose.Types.ObjectId(userId);
-  } else {
+  if (!mongoose.Types.ObjectId.isValid(userId)) {
     throw new Error("ID de usuario no válido");
   }
-  const subscriptionBD = await Subscription.findOne({ user: userObjectId });
+
+  if (!mongoose.isValidObjectId(userId)) {
+    throw new Error("ID de usuario no válido");
+  }
+
+  const subscriptionBD = await Subscription.findOne({ user: userId });
 
   if (!subscriptionBD || !subscriptionBD.stripeSubscriptionId) {
     throw new Error('Usuario o suscripción no encontrados');
@@ -117,7 +120,6 @@ const updateStripeSubscription = async (userId, newPlan) => {
 
   const subscriptionItemId = subscription.items.data[0].id;
 
-  // Update stripe subscription
   const updatedSubscription = await stripe.subscriptions.update(subscription.id, {
     items: [{ id: subscriptionItemId, price: newProductId }],
     proration_behavior: 'create_prorations',
@@ -134,10 +136,9 @@ const updateStripeSubscription = async (userId, newPlan) => {
     };
   }
 
-  // update new plan and renewwal date in DB
   subscriptionBD.plan = newPlan;
   subscriptionBD.status = "active";
-  subscriptionBD.renewalDate = calculateRenewalDate(newPlan);
+  subscriptionBD.renewalDate = new Date(updatedSubscription.current_period_end * 1000);
   await subscriptionBD.save();
 
   return updatedSubscription;

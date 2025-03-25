@@ -9,11 +9,10 @@ async function registerClick(req, res) {
   const ip = req.headers["x-forwarded-for"] || req.connection.remoteAddress;
   const ipToCheck = ip === "::1" || ip === "127.0.0.1" ? "8.8.8.8" : ip;
 
-
-  console.log("Registrando clic...");
-  console.log("shortId:", shortId);
-  console.log("IP:", ip);
-  console.log("User-Agent:", userAgent);
+  console.log("<<<----- Registrando clic... ----->>>");
+  console.log("<<<----- shortId recibido: ------->>>", req.params.shortId);
+  console.log("<<<----- IP: --------------------->>>", req.headers["x-forwarded-for"] || req.connection.remoteAddress);
+  console.log("<<<----- User-Agent: ------------->>>", req.headers["user-agent"]);
 
   const md = new MobileDetect(userAgent);
   const isMobile = md.mobile() !== null;
@@ -39,9 +38,10 @@ async function registerClick(req, res) {
     const url = await Url.findOne({ shortId });
 
     if (!url) {
-      console.error("no hay URL:");
+      console.error("<<<<----- No se encontró la URL con shortId: ----->>>>", shortId);
       return res.status(404).json({ message: "URL no encontrada" });
     }
+    console.log("<<<<----- URL encontrada en BD: ----->>>>", url.originalUrl);
 
     const clickData = {
       url: url._id,
@@ -54,7 +54,8 @@ async function registerClick(req, res) {
     const newClick = new Click(clickData);
     await newClick.save();
 
-    return res.status(200).json({ message: "Click registrado exitosamente" });
+console.log("<<<<----- originalUrl ----->>>>", url.originalUrl)
+    return res.status(200).json({ originalUrl: url.originalUrl });
   } catch (err) {
     console.error("Error saving click:", err);
     return res.status(500).json({ message: "Error al registrar el clic" });
@@ -62,3 +63,4 @@ async function registerClick(req, res) {
 }
 
 module.exports = { registerClick };
+
