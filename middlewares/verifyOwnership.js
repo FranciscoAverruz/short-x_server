@@ -1,5 +1,4 @@
 const verifyOwnership = (req, res, next) => {
-
   if (req.user && req.user.isAdmin) {
     return next();
   }

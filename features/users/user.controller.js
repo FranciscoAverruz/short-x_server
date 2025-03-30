@@ -34,10 +34,10 @@ async function retUsersAll(req, res) {
       },
     });
   } catch (err) {
-    console.error("Error retrieving users:", err);
+    console.error("Error retrieving users:");
     res
       .status(500)
-      .json({ error: "Error retrieving users", details: err.message });
+      .json({ error: "Error retrieving users", details: "could not get Users' information" });
   }
 }
 
@@ -52,11 +52,10 @@ async function retUserById(req, res) {
 
     const { password, ...noPasswordUser } = userDoc.toObject();
 
-    console.log("User found by ID: ", noPasswordUser);
     res.status(200).json(noPasswordUser);
   } catch (err) {
-    console.log("Error retrieving user by ID ", err);
-    res.status(400).json({ error: err.message });
+    console.log("Error retrieving user by ID ");
+    res.status(400).json({ error: "could not find the User" });
   }
 }
 
@@ -64,8 +63,6 @@ async function retUserById(req, res) {
 async function updateUser(req, res) {
   try {
     const { password, urls, isAdmin, ...userData } = req.body;
-    console.log("req.body user.controller ==== ", req.body);
-    console.log("User ID user.controller ==== ", req.params.id);
 
     const updatedUser = await User.findByIdAndUpdate(
       req.params.id,
@@ -79,18 +76,15 @@ async function updateUser(req, res) {
 
     const { password: _, ...noPasswordUser } = updatedUser.toObject();
 
-    console.log("User updated successfully: ", noPasswordUser);
     res.status(200).json(noPasswordUser);
   } catch (err) {
-    console.log("Error updating the user: ", err);
-    res.status(400).json({ error: err.message });
+    console.log("Error updating the user: ");
+    res.status(400).json({ error: "could not update the user's information" });
   }
 }
-
-
 
 module.exports = {
   retUsersAll,
   retUserById,
-  updateUser
+  updateUser,
 };

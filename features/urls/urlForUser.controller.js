@@ -82,7 +82,7 @@ const shortenUrlForUser = async (req, res) => {
     console.error(err);
     return res
       .status(500)
-      .json({ error: "Internal server error", message: err.message });
+      .json({ error: "Internal server error", message: "Error completin the process, Try again later"});
   }
 };
 

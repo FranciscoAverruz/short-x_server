@@ -6,12 +6,6 @@ const User = require("../models/User.model");
 const router = express.Router();
 
 router.post("/webhook", express.raw({ type: "application/json" }), async (req, res) => {
-  console.log('Datos de la sesión:', session);
-
-  console.log("ESTOY EN EL WEBHOOK")
-  console.log("Webhook recibido en el servidor");
-  console.log("Headers:", req.headers);
-  console.log("Body:", req.body.toString());
   
   const sig = req.headers["stripe-signature"];
   let event;
@@ -19,11 +13,9 @@ router.post("/webhook", express.raw({ type: "application/json" }), async (req, r
   try {
     event = stripe.webhooks.constructEvent(req.body, sig, process.env.STRIPE_WEBHOOK_SECRET);
   } catch (err) {
-    console.error("Error verificando webhook:", err);
-    return res.status(400).send(`Webhook error: ${err.message}`);
+    console.error("Error verificando webhook:");
+    return res.status(400).send(`Webhook error`);
   }
-
-  console.log("Evento recibido:", event);
 
   try {
     const data = event.data.object;
@@ -47,7 +39,7 @@ router.post("/webhook", express.raw({ type: "application/json" }), async (req, r
 
     res.json({ received: true });
   } catch (error) {
-    console.error("Error manejando webhook:", error);
+    console.error("Error manejando webhook:");
     res.status(500).send("Error interno del servidor");
   }
 });

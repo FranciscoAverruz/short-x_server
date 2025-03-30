@@ -15,7 +15,7 @@ const getSubscriptionInfo = async (req, res) => {
 
     res.status(200).json({ success: true, subscription: user.subscription });
   } catch (error) {
-    res.status(500).json({ success: false, error: error.message });
+    res.status(500).json({ success: false, error: "No se pudo obtener informacion de la suscripción"});
   }
 };
 
@@ -47,8 +47,8 @@ const updateSubscription = async (req, res) => {
 
     res.status(200).json({ success: true, subscription });
   } catch (error) {
-    console.error('Error al actualizar la suscripción:', error);
-    res.status(500).json({ success: false, error: error.message });
+    console.error('Error al actualizar la suscripción');
+    res.status(500).json({ success: false, error: "Hubo un error en el proceso" });
   }
 };
 
@@ -60,7 +60,7 @@ const cancelSubscription = async (req, res) => {
     const result = await cancelStripeSubscription(id);
     res.status(200).json(result);
   } catch (error) {
-    res.status(500).json({ success: false, error: error.message });
+    res.status(500).json({ success: false, error: "Error Cancelando la Suscripción"});
   }
 };
 
@@ -72,7 +72,7 @@ const suspendCancelSubscription = async (req, res) => {
     const result = await suspendStripeCancellation(id);
     res.status(200).json(result);
   } catch (error) {
-    res.status(500).json({ success: false, error: error.message });
+    res.status(500).json({ success: false, error: "Error procesando la suspensión" });
   }
 };
 
@@ -92,7 +92,7 @@ const getPaymentHistory = async (req, res) => {
 
     return res.status(200).json({ payments: paymentHistory });
   } catch (error) {
-    console.error('Error al obtener el historial de pagos:', error);
+    console.error('Error al obtener el historial de pagos');
     return res.status(500).json({ message: 'No se pudo obtener el historial de pagos.' });
   }
 };
@@ -104,8 +104,8 @@ const getUpcomingpay = async (req, res) => {
     const invoice = await getUpcomingInvoice(userId, newPlan);
     res.json(invoice);
   } catch (error) {
-    console.error("Error obteniendo factura futura:", error);
-    res.status(500).json({ error: error.message });
+    console.error("Error obteniendo factura futura:");
+    res.status(500).json({ error: "No se pudo obtener informacion del próximo pago"});
   }
 };
 

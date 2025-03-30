@@ -25,7 +25,7 @@ async function setupPassword(req, res) {
     console.log("Password setup successfully");
     res.status(200).json({ message: "Password setup successfully." });
   } catch (err) {
-    console.error("Error setting up the password:", err);
+    console.error("Error setting up the password:");
     res.status(500).json({ error: "ServerError", message: "An error occurred while setting up the password." });
   }
 }
@@ -54,7 +54,7 @@ async function changePassword(req, res) {
     console.log("Password changed successfully");
     res.status(200).json({ message: "Password changed successfully." });
   } catch (err) {
-    console.error("Error changing the password:", err);
+    console.error("Error changing the password:");
     res.status(500).json({ error: "ServerError", message: "An error occurred while changing the password." });
   }
 }
@@ -80,7 +80,7 @@ async function requestPasswordReset(req, res) {
 
     return res.status(200).json({ message: "Email sent. Please check your inbox." });
   } catch (error) {
-    console.error("Error requesting password reset:", error);
+    console.error("Error requesting password reset:");
     return res.status(500).json({ error: "ServerError", message: "An error occurred while sending the email." });
   }
 }

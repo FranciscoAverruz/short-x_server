@@ -4,12 +4,8 @@ const { registerClick } = require("../clicks/click.controller.js");
 const redirectUrl = async (req, res) => {
   try {
     const shortId = req.params.shortId;
-
     const fullRequestUrl = `${req.protocol}://${req.headers.host}${req.originalUrl}`;
-    console.log("<<<<------------ Full Request URL ------------>>>>", fullRequestUrl);
-
     let requestOrigin = req.get("origin") || req.get("referer") || fullRequestUrl;
-    console.log("<<<<------------ requestOrigin ------------>>>>", requestOrigin);
 
     // cache configuration
     res.set("Cache-Control", "no-store, no-cache, must-revalidate, proxy-revalidate");
@@ -29,10 +25,6 @@ const redirectUrl = async (req, res) => {
       const requestBaseDomain = requestOrigin ? new URL(requestOrigin).hostname : null;
       const backendBaseDomain = new URL(process.env.BACKEND_URL).hostname;
 
-      console.log("****** Custom Domain Base:", customDomainBase);
-      console.log("****** Request Base Domain:", requestBaseDomain);
-      console.log("****** Backend Base Domain:", backendBaseDomain);
-
       if (!requestBaseDomain || (requestBaseDomain !== customDomainBase && requestBaseDomain !== backendBaseDomain)) {
         return res.status(403).json({
           message: "Este dominio no tiene permiso para redirigir esta URL.",
@@ -42,12 +34,12 @@ const redirectUrl = async (req, res) => {
 
     // Register click asynchronously
     registerClick(req)
-      .then(() => console.log("Click registrado correctamente"))
-      .catch((err) => console.error("Error al registrar el clic:", err));
+      .then(() => console.log("<<<------ Click registrado correctamente ------>>>"))
+      .catch((err) => console.error("<<<------ Error al registrar el clic: ------>>>"));
 
     return res.redirect(302, url.originalUrl);
   } catch (error) {
-    console.error("Error en la redirección:", error);
+    console.error("Error en la redirección:");
     return res.status(500).json({ message: "Error al redirigir." });
   }
 };
