@@ -17,7 +17,6 @@ const transporter = nodemailer.createTransport({
 async function sendEmail(to, subject, templatePath, replacements) {
   try {
     let template = fs.readFileSync(path.resolve(templatePath), "utf-8");
-    console.log("Template path ///////// ", path.resolve(templatePath));
 
     for (const key in replacements) {
       template = template.replace(`{{${key}}}`, replacements[key]);
@@ -33,7 +32,6 @@ async function sendEmail(to, subject, templatePath, replacements) {
     await transporter.sendMail(mailOptions);
     console.log(`Email sent successfully to ${to}`);
   } catch (error) {
-    console.error("Error sending email:", error.response || error.message);
     throw new Error("Could not send email.");
   }
 }
