@@ -14,8 +14,6 @@ const loadAllowedDomainsIfNeeded = async () => {
     allowedDomains = new Set(customDomains.map((domain) => domain.domain));
     if (FRONTEND_URL) allowedDomains.add(FRONTEND_URL);
 
-    console.log("<<<<--------- allowedDomains --------->>>>", allowedDomains)
-
     lastUpdate = Date.now();
   } catch (error) {
     console.error("Error al obtener dominios personalizados:", error);
@@ -25,8 +23,14 @@ const loadAllowedDomainsIfNeeded = async () => {
 // OPTIONS requests (preflight) handling
 const handleOptions = (req, res, next) => {
   res.setHeader("Access-Control-Allow-Origin", "*");
-  res.setHeader("Access-Control-Allow-Methods", "GET, POST, OPTIONS, PUT, DELETE");
-  res.setHeader("Access-Control-Allow-Headers", "Content-Type, Authorization, X-Requested-With");
+  res.setHeader(
+    "Access-Control-Allow-Methods",
+    "GET, POST, OPTIONS, PUT, DELETE"
+  );
+  res.setHeader(
+    "Access-Control-Allow-Headers",
+    "Content-Type, Authorization, X-Requested-With"
+  );
   res.setHeader("Access-Control-Allow-Credentials", "true");
 
   res.status(204).send("");

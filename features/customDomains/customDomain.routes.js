@@ -1,6 +1,11 @@
 const express = require("express");
 const verifyAuth = require("../../middlewares/verifyAuth");
-const { addCustomDomain, getCustomDomains, verifyCustomDomain, deleteCustomDomain } = require("../customDomains/customDomain.controller.js");
+const {
+  addCustomDomain,
+  getCustomDomains,
+  verifyCustomDomain,
+  deleteCustomDomain,
+} = require("../customDomains/customDomain.controller.js");
 
 const router = express.Router();
 

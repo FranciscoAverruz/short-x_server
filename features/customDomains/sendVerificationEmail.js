@@ -1,9 +1,19 @@
 const nodemailer = require("nodemailer");
-const { EMAIL_HOST, EMAIL_USER, EMAIL_PASS, EMAIL_USER } = require("../../config/env.js")
+const {
+  EMAIL_HOST,
+  EMAIL_USER,
+  EMAIL_PASS,
+  EMAIL_USER,
+} = require("../../config/env.js");
 
-const sendVerificationEmail = async (userEmail, domain, verificationToken, verificationLink) => {
+const sendVerificationEmail = async (
+  userEmail,
+  domain,
+  verificationToken,
+  verificationLink
+) => {
   const transporter = nodemailer.createTransport({
-    host: EMAIL_HOST, 
+    host: EMAIL_HOST,
     port: 465,
     secure: true,
     auth: {

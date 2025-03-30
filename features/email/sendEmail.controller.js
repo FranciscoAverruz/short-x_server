@@ -1,20 +1,24 @@
 const nodemailer = require("nodemailer");
 const fs = require("fs");
 const path = require("path");
-const {EMAIL_USER, EMAIL_PASS, NODE_ENV} = require("../../config/env.js")
+const { EMAIL_USER, EMAIL_PASS, NODE_ENV } = require("../../config/env.js");
 
 const sendEmail = async (req, res) => {
   const { name, phone, email, message, countryName } = req.body;
 
   try {
-    const templatePath = path.resolve(__dirname, "./templates/contactEmailFromWeb.html");
+    const templatePath = path.resolve(
+      __dirname,
+      "./templates/contactEmailFromWeb.html"
+    );
     let template = fs.readFileSync(templatePath, "utf8");
 
-    template = template.replace("{{name}}", name)
-                       .replace("{{phone}}", phone)
-                       .replace("{{email}}", email)
-                       .replace("{{message}}", message)
-                       .replace("{{countryName}}", countryName);
+    template = template
+      .replace("{{name}}", name)
+      .replace("{{phone}}", phone)
+      .replace("{{email}}", email)
+      .replace("{{message}}", message)
+      .replace("{{countryName}}", countryName);
 
     let transporter = nodemailer.createTransport({
       service: "gmail",

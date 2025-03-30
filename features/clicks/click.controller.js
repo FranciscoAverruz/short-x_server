@@ -17,7 +17,6 @@ async function registerClick(req) {
     if (ip === "127.0.0.1" || ip === "::1") {
       ip = "8.8.8.8";
     }
-    
 
     console.log("Registrando clic...");
     console.log("shortId:", shortId);

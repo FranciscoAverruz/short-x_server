@@ -1,8 +1,8 @@
-const CustomDomain = require("../customDomains/CustomDomain.model.js"); 
-const User = require("../users/User.model.js"); 
+const CustomDomain = require("../customDomains/CustomDomain.model.js");
+const User = require("../users/User.model.js");
 const crypto = require("crypto");
 const { sendEmail } = require("../../utils/email.js");
-const { FRONTEND_URL } = require("../../config/env.js")
+const { FRONTEND_URL } = require("../../config/env.js");
 const path = require("path");
 
 // Adds a new custom domain  ****************************************************
@@ -12,8 +12,14 @@ const addCustomDomain = async (req, res) => {
     const userId = req.user.id;
 
     const user = await User.findById(userId).populate("subscription", "plan");
-    if (!user || !user.subscription || !user.subscription.plan.includes("premium")) {
-      return res.status(403).json({ message: "Premium plan required for custom domains" });
+    if (
+      !user ||
+      !user.subscription ||
+      !user.subscription.plan.includes("premium")
+    ) {
+      return res
+        .status(403)
+        .json({ message: "Premium plan required for custom domains" });
     }
 
     const existingDomain = await CustomDomain.findOne({ domain });
@@ -32,10 +38,15 @@ const addCustomDomain = async (req, res) => {
     user.customDomains.push(newDomain._id);
     await user.save();
 
-    const verificationLink = `${FRONTEND_URL}/dashboard/domains/verify-domain?token=${verificationToken}&domain=${encodeURIComponent(domain)}`;
+    const verificationLink = `${FRONTEND_URL}/dashboard/domains/verify-domain?token=${verificationToken}&domain=${encodeURIComponent(
+      domain
+    )}`;
 
     const subject = "Verificación de Dominio Personalizado";
-    const templatePath = path.resolve(__dirname, "../email/templates/customDomainVerificationEmail.html");
+    const templatePath = path.resolve(
+      __dirname,
+      "../email/templates/customDomainVerificationEmail.html"
+    );
     const replacements = {
       domain,
       verificationToken,
@@ -54,7 +65,9 @@ const addCustomDomain = async (req, res) => {
 // Gets user's Domains  *********************************************************
 const getCustomDomains = async (req, res) => {
   try {
-    const domains = await CustomDomain.find({ user: req.user.id }).select("domain verified");
+    const domains = await CustomDomain.find({ user: req.user.id }).select(
+      "domain verified"
+    );
     res.json(domains);
   } catch (error) {
     res.status(500).json({ message: "Server error", error });
@@ -108,10 +121,14 @@ const deleteCustomDomain = async (req, res) => {
 
     const domain = await CustomDomain.findOne({ _id: domainId, user: userId });
     if (!domain) {
-      return res.status(404).json({ message: "Domain not found or unauthorized" });
+      return res
+        .status(404)
+        .json({ message: "Domain not found or unauthorized" });
     }
 
-    await User.findByIdAndUpdate(userId, { $pull: { customDomains: domainId } });
+    await User.findByIdAndUpdate(userId, {
+      $pull: { customDomains: domainId },
+    });
 
     await domain.deleteOne();
     res.json({ message: "Domain deleted successfully" });
@@ -121,8 +138,8 @@ const deleteCustomDomain = async (req, res) => {
 };
 
 module.exports = {
-    addCustomDomain,
-    getCustomDomains,
-    verifyCustomDomain,
-    deleteCustomDomain
+  addCustomDomain,
+  getCustomDomains,
+  verifyCustomDomain,
+  deleteCustomDomain,
 };
