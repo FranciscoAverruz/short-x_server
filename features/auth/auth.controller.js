@@ -139,7 +139,15 @@ const signupUser = async (req, res) => {
       user,
     });
   } catch (error) {
-    console.error("Error during registration:", error);
+    console.error("Error during registration:");
+
+    if (error.message === "The password must be at least 5 characters long, include an uppercase letter, a number, and a special symbol" ||
+      error.message === "Passwords do not match" ||
+      error.message === "This email is already registered.") {
+    return res.status(400).json({
+      error: error.message,  // Mensaje de error específico
+    });
+  }
 
     return res.status(500).json({
       error: "INTERNAL_SERVER_ERROR",

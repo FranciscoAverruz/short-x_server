@@ -5,11 +5,10 @@ const http = require("http");
 const mongoose = require("mongoose");
 const app = express();
 const path = require("path");
-const dotenv = require('dotenv').config();
+const dotenv = require("dotenv").config();
 const swaggerUI = require("swagger-ui-express");
 
 const { initSocket } = require("./sockets/socket.js");
-
 const sendEmail = require("./features/email/sendEmail.controller.js");
 const verifyAuth = require("./middlewares/verifyAuth.js");
 const verifyAdmin = require("./middlewares/verifyAdmin.js");
@@ -28,10 +27,9 @@ const { corsOptions, handleOptions } = require("./config/corsConfig.js");
 const stripe = require("./config/stripe");
 
 app.use(cors(corsOptions));
-app.options('*', handleOptions);
+app.options("*", handleOptions);
 
 app.use(express.json());
-
 
 // *** SWAGGER IMPLEMENTATION *****************************************************
 const openApiDocument = path.resolve(__dirname, "openApi/output.yaml");
@@ -42,21 +40,29 @@ app.use("/api-docs", swaggerUI.serve, swaggerUI.setup(swaggerDocument));
 const port = process.env.PORT || 5000;
 const mongoDB = process.env.MONGO_URI;
 
+const server = http.createServer(app);
 mongoose
   .connect(mongoDB)
   .then(() => {
     console.log("mongoose connected");
-    const server = http.createServer(app);
 
-    initSocket(server);
-    server.listen(port, () => {
-      console.log("Server running on port " + port);
-    });
+    // Not executed while on test environment ----------
+    if (
+      process.env.NODE_ENV === "production" ||
+      process.env.NODE_ENV === "development"
+    ) {
+      const server = http.createServer(app);
 
-    // createAdmin executed after conexion is set ***********************************
-    createAdmin().then(() => {
-      console.log("Admin creation script executed");
-    });
+      initSocket(server);
+      server.listen(port, () => {
+        console.log("Server running on port " + port);
+      });
+
+      // createAdmin executed after conexion is set -----
+      createAdmin().then(() => {
+        console.log("Admin creation script executed");
+      });
+    }
   })
   .catch((err) => {
     console.error("Error connecting to MongoDB:", err);
@@ -93,4 +99,4 @@ process.on("SIGINT", () => {
   });
 });
 
-module.exports = app;
+module.exports = { app, server };

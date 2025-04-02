@@ -17,17 +17,17 @@ const createValidatedUser = async ({
     !/[!@#$%^&*]/.test(password)
   ) {
     throw new Error(
-      "La contraseña debe tener al menos 5 caracteres, incluir una mayúscula, un número y un símbolo especial."
+      "The password must be at least 5 characters long, include an uppercase letter, a number, and a special symbol"
     );
   }
 
   if (password !== confirmPassword) {
-    throw new Error("Las contraseñas no coinciden.");
+    throw new Error("Passwords do not match");
   }
 
   const existingUser = await User.findOne({ email });
   if (existingUser) {
-    throw new Error("Este correo ya está registrado.");
+    throw new Error("This email is already registered.");
   }
 
   return {
