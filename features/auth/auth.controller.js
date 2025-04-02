@@ -89,7 +89,7 @@ const signupUser = async (req, res) => {
       });
       const templatePath = path.join(
         __dirname,
-        "../templates/passwordSetupTemplate.html"
+        "../email/templates/userRegistrationTemplate.html"
       );
       const setupLink = `${FRONTEND_URL}/setup-password?token=${token}`;
       await sendEmail(email, "Set up your password", templatePath, {
@@ -126,8 +126,9 @@ const signupUser = async (req, res) => {
 
     const templatePath = path.join(
       __dirname,
-      "./templates/userRegistrationTemplate.html"
+      "../email/templates/userRegistrationTemplate.html"
     );
+
     await sendEmail(email, "Successful Registration!", templatePath, {
       username,
     });

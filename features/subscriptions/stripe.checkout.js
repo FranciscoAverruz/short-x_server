@@ -3,6 +3,8 @@ const User = require("../users/User.model");
 const { createStripeSubscription } = require("./stripe.service.js");
 const { createUser } = require("../auth/auth.controller.js");
 const createValidatedUser = require("../../utils/createValidatedUser.js");
+const { sendEmail } = require("../../utils/email");
+const path = require("path");
 const {
   STPRICE_PRO_MONTHLY,
   STPRICE_PRO_ANNUAL,
@@ -50,9 +52,7 @@ const createCheckoutSession = async (req, res) => {
     res.json({ sessionId: session.id, url: session.url });
   } catch (error) {
     console.error("Error al crear la sesión de checkout: ");
-    res
-      .status(500)
-      .json({ error: `No se pudo crear la sesión de pago.` });
+    res.status(500).json({ error: `No se pudo crear la sesión de pago.` });
   }
 };
 
@@ -86,7 +86,6 @@ const stripeWebhook = async (req, res) => {
         session.metadata.plan,
         session.subscription
       );
-
     } catch (err) {
       console.error("Error al procesar el usuario o suscripción");
       return res
@@ -184,13 +183,22 @@ const verifyPayment = async (req, res) => {
       sessionToSend
     );
 
+    // confirmation email -------------
+    const templatePath = path.join(
+      __dirname,
+      "../email/templates/userRegistrationTemplate.html"
+    );
+    await sendEmail(user.email, "Successful Registration!", templatePath, {
+      username: user.username,
+    });
+
     return res.status(200).json({
       success: true,
       message: "Pago confirmado y suscripción creada.",
       subscription: subscription,
     });
   } catch (error) {
-    console.error("Error al verificar el pago:");
+    console.error("Error al verificar el pago:", error);
     return res.status(500).json({
       success: false,
       message: `Error al verificar el pago: ${error.message}`,
