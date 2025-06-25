@@ -72,11 +72,12 @@ UserSchema.methods.generateJWT = async function () {
       username: this.username || "",
       isAdmin: this.isAdmin || false,
       plan: plan,
+      startDate: this.createdAt, 
     };
 
     if (!JWT_SECRET) {
       throw new Error(
-        "JWT_SECRET no está definido en las variables de entorno"
+        "JWT_SECRET is not defined in the environment variables."
       );
     }
 
@@ -84,8 +85,8 @@ UserSchema.methods.generateJWT = async function () {
       expiresIn: "2d",
     });
   } catch (err) {
-    console.error("Error al generar el JWT:", err);
-    throw new Error("Error al generar el JWT");
+    console.error("Error generating JWT:", err);
+    throw new Error("Error generating JWT");
   }
 };
 

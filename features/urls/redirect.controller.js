@@ -16,7 +16,7 @@ const redirectUrl = async (req, res) => {
     let url = await Url.findOne({ shortId }).populate("customDomain");
 
     if (!url) {
-      return res.status(404).json({ message: "URL no encontrada." });
+      return res.status(404).json({ message: "URL not found." });
     }
 
     // custom Domain validation
@@ -27,20 +27,20 @@ const redirectUrl = async (req, res) => {
 
       if (!requestBaseDomain || (requestBaseDomain !== customDomainBase && requestBaseDomain !== backendBaseDomain)) {
         return res.status(403).json({
-          message: "Este dominio no tiene permiso para redirigir esta URL.",
+          message: "This domain is not allowed to redirect thhis URL.",
         });
       }
     }
 
     // Register click asynchronously
     registerClick(req)
-      .then(() => console.log("<<<------ Click registrado correctamente ------>>>"))
-      .catch((err) => console.error("<<<------ Error al registrar el clic: ------>>>"));
+      .then(() => console.log("<<<------ Click succesfully registered ------>>>"))
+      .catch((err) => console.error("<<<------ Error while registering click: ------>>>"));
 
     return res.redirect(302, url.originalUrl);
   } catch (error) {
-    console.error("Error en la redirección:");
-    return res.status(500).json({ message: "Error al redirigir." });
+    console.error("Error redirecting.");
+    return res.status(500).json({ message: "Error redirecting." });
   }
 };
 

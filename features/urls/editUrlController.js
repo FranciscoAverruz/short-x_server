@@ -10,7 +10,7 @@ const updateUrl = async (req, res) => {
     if (!mongoose.Types.ObjectId.isValid(id)) {
       return res.status(400).json({
         errorCode: "INVALID_ID",
-        message: "El ID proporcionado no es válido.",
+        message: "Invalid ID.",
       });
     }
 
@@ -27,7 +27,7 @@ const updateUrl = async (req, res) => {
     if (existingUrl) {
       return res.status(400).json({
         errorCode: "DUPLICATE_URL",
-        message: "El shortId y customDomain ya están en uso por otra URL.",
+        message: "ShortId and customDomain already in use",
       });
     }
 
@@ -40,25 +40,25 @@ const updateUrl = async (req, res) => {
     if (!updatedUrl) {
       return res.status(404).json({
         errorCode: "URL_NOT_FOUND",
-        message: "No se encontró la URL solicitada.",
+        message: "URL not found",
       });
     }
 
     res.json(updatedUrl);
   } catch (error) {
-    console.error("Error en updateUrl:", error);
+    console.error("Error in updateUrl:", error);
 
     if (error.name === "ValidationError") {
       return res.status(400).json({
         errorCode: "VALIDATION_ERROR",
-        message: "Los datos proporcionados no son válidos.",
+        message: "Invalid data",
         details: error.errors,
       });
     }
 
     res.status(500).json({
       errorCode: "SERVER_ERROR",
-      message: "Error interno al actualizar la URL.",
+      message: "Internal Error updating URL.",
     });
   }
 };

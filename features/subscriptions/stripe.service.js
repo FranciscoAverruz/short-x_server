@@ -20,7 +20,7 @@ const handleSubscription = async (
   renewalDate
 ) => {
   const user = await User.findOne({ email });
-  if (!user) throw new Error("Usuario no encontrado al crear la suscripción");
+  if (!user) throw new Error("User not found while creating the subscription");
 
   const newSubscription = new Subscription({
     user: user._id,
@@ -53,7 +53,7 @@ const createStripeSubscription = async (
   try {
     const user = await User.findById(userId);
     if (!user) {
-      throw new Error("Usuario no encontrado");
+      throw new Error("User not found");
     }
 
     let productId;
@@ -71,7 +71,7 @@ const createStripeSubscription = async (
         productId = STPRICE_PRO_MONTHLY;
         break;
       default:
-        throw new Error("Plan no válido");
+        throw new Error("Invalid plan");
     }
 
     await stripe.paymentMethods.attach(paymentMethodId, {
@@ -107,29 +107,29 @@ const createStripeSubscription = async (
 
     return newSubscription;
   } catch (error) {
-    console.error("Error en createStripeSubscription:");
-    throw new Error("Error guardando la suscripción en la base de datos");
+    console.error("Error creating a stripe subscription");
+    throw new Error("Error adding subscription into data base");
   }
 };
 
 // Updates subscription with proration handling and database update. ****************
 const updateStripeSubscription = async (userId, newPlan) => {
   if (!newPlan) {
-    throw new Error("Plan no válido");
+    throw new Error("Invalid plan");
   }
 
   if (!mongoose.Types.ObjectId.isValid(userId)) {
-    throw new Error("ID de usuario no válido");
+    throw new Error("Invalid User ID");
   }
 
   if (!mongoose.isValidObjectId(userId)) {
-    throw new Error("ID de usuario no válido");
+    throw new Error("Invalid User ID");
   }
 
   const subscriptionBD = await Subscription.findOne({ user: userId });
 
   if (!subscriptionBD || !subscriptionBD.stripeSubscriptionId) {
-    throw new Error("Usuario o suscripción no encontrados");
+    throw new Error("User or Subscription not found");
   }
 
   if (newPlan === "free_monthly" || newPlan === "free_annual") {
@@ -140,7 +140,7 @@ const updateStripeSubscription = async (userId, newPlan) => {
       await suspendStripeCancellation(userId);
       return {
         success: true,
-        message: "Cancelación suspendida. No se realizó ninguna acción.",
+        message: "Cancellation suspended. no actions were executed",
       };
     }
 
@@ -155,14 +155,14 @@ const updateStripeSubscription = async (userId, newPlan) => {
   };
 
   const newProductId = priceMap[newPlan];
-  if (!newProductId) throw new Error("Plan no válido");
+  if (!newProductId) throw new Error("Invalid Plan");
 
   const subscription = await stripe.subscriptions.retrieve(
     subscriptionBD.stripeSubscriptionId
   );
 
   if (!subscription.items || !subscription.items.data.length) {
-    throw new Error("No hay items de suscripción para actualizar.");
+    throw new Error("No subscription items were found to update");
   }
 
   const subscriptionItemId = subscription.items.data[0].id;
@@ -201,7 +201,7 @@ const cancelStripeSubscription = async (userId, newPlan) => {
   try {
     const user = await User.findById(userId).populate("subscription");
     if (!user || !user.subscription)
-      throw new Error("Usuario o suscripción no encontrados");
+      throw new Error("User or subscription not found");
 
     const subscription = user.subscription;
 
@@ -223,13 +223,13 @@ const cancelStripeSubscription = async (userId, newPlan) => {
       return {
         success: true,
         message:
-          "El cambio a un plan gratuito se completará al final del período de facturación.",
+          "The migration to a free plan will be completed at the end of the billing cycle",
       };
     }
 
     // verifies if subscription is canceled
     if (subscription.status === "cancelled") {
-      throw new Error("La suscripción ya está cancelada.");
+      throw new Error("Subscription already cancelled");
     }
 
     // schedules stripe cancelation for end of billing sycle
@@ -250,10 +250,10 @@ const cancelStripeSubscription = async (userId, newPlan) => {
     return {
       success: true,
       message:
-        "La suscripción se cancelará al final del período de facturación.",
+        "The subscription will be cancelled at the end of billing cycle",
     };
   } catch (error) {
-    throw new Error(`Error al programar la cancelación`);
+    throw new Error(`Error scheduling the cancelation`);
   }
 };
 
@@ -262,7 +262,7 @@ const suspendStripeCancellation = async (userId) => {
   try {
     const user = await User.findById(userId).populate("subscription");
     if (!user || !user.subscription)
-      throw new Error("Usuario o suscripción no encontrados");
+      throw new Error("User or subscription not found");
 
     const subscription = user.subscription;
 
@@ -273,7 +273,7 @@ const suspendStripeCancellation = async (userId) => {
       subscription.status !== "pending"
     ) {
       throw new Error(
-        "No hay cancelación pendiente o la suscripción no está activa."
+        "no pending cancellation found or the subscripcion is not active"
       );
     }
 
@@ -283,7 +283,7 @@ const suspendStripeCancellation = async (userId) => {
 
     // verifies if subscription in stripe is not scheduled to be canceled
     if (!stripeSubscription.cancel_at_period_end) {
-      throw new Error("La suscripción no está programada para cancelarse.");
+      throw new Error("Subscription not scheduled to be cancelled");
     }
 
     // suspends the cancelation process
@@ -305,10 +305,10 @@ const suspendStripeCancellation = async (userId) => {
 
     return {
       success: true,
-      message: "La cancelación de la suscripción ha sido suspendida.",
+      message: "Subscription cancellation was suspended",
     };
   } catch (error) {
-    throw new Error(`Error al suspender la cancelación de la suscripción`);
+    throw new Error(`Subscription cancellation failed`);
   }
 };
 
@@ -326,15 +326,15 @@ const getUserPaymentHistory = async (stripeCustomerId, limit = 10) => {
       status: invoice.status === "paid" ? "success" : "pending",
       paymentMethod: invoice.payment_intent ? "card" : "unknown",
       transactionId: invoice.payment_intent || invoice.id,
-      invoiceNumber: invoice.number || "Sin número",
+      invoiceNumber: invoice.number || "####",
       timestamp: new Date(invoice.created * 1000),
       invoiceUrl: invoice.hosted_invoice_url || invoice.invoice_pdf,
     }));
 
     return paymentHistory;
   } catch (error) {
-    console.error("Error al obtener el historial de pagos desde Stripe:");
-    throw new Error("No se pudo obtener el historial de pagos.");
+    console.error("Error retrieving stripe payment history");
+    throw new Error("Unable to get payment history");
   }
 };
 
@@ -343,7 +343,7 @@ const getUpcomingInvoice = async (userId, newPlan) => {
   const subscriptionBD = await Subscription.findOne({ user: userId });
 
   if (!subscriptionBD || !subscriptionBD.stripeSubscriptionId) {
-    throw new Error("Usuario o suscripción no encontrados");
+    throw new Error("User or subscription not found");
   }
 
   const priceMap = {
@@ -354,14 +354,14 @@ const getUpcomingInvoice = async (userId, newPlan) => {
   };
 
   const newProductId = priceMap[newPlan];
-  if (!newProductId) throw new Error("Plan no válido");
+  if (!newProductId) throw new Error("Invalid plan");
 
   const subscription = await stripe.subscriptions.retrieve(
     subscriptionBD.stripeSubscriptionId
   );
 
   if (!subscription.items || !subscription.items.data.length) {
-    throw new Error("No hay items de suscripción para actualizar.");
+    throw new Error("No subscription items to update");
   }
 
   const subscriptionItemId = subscription.items.data[0].id;

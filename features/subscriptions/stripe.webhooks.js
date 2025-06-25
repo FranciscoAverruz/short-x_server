@@ -13,7 +13,7 @@ router.post("/webhook", express.raw({ type: "application/json" }), async (req, r
   try {
     event = stripe.webhooks.constructEvent(req.body, sig, process.env.STRIPE_WEBHOOK_SECRET);
   } catch (err) {
-    console.error("Error verificando webhook:");
+    console.error("Error verifying webhook:");
     return res.status(400).send(`Webhook error`);
   }
 
@@ -34,13 +34,13 @@ router.post("/webhook", express.raw({ type: "application/json" }), async (req, r
         break;
 
       default:
-        console.log(`Evento no manejado: ${event.type}`);
+        console.log(`Event not handled: ${event.type}`);
     }
 
     res.json({ received: true });
   } catch (error) {
-    console.error("Error manejando webhook:");
-    res.status(500).send("Error interno del servidor");
+    console.error("Error handling webhook:");
+    res.status(500).send("Internal server error");
   }
 });
 
@@ -68,11 +68,11 @@ async function handlePaymentSuccess(data) {
   );
 
   if (!updatedSubscription) {
-    console.error("Suscripción no encontrada para actualizar.");
+    console.error("Subscription not found to update");
     return;
   }
 
-  console.log(`Pago exitoso registrado para la suscripción: ${subscriptionId}`);
+  console.log(`Payment successfully registered for subscription: ${subscriptionId}`);
 }
 
 async function handleSubscriptionUpdate(data) {
@@ -88,11 +88,11 @@ async function handleSubscriptionUpdate(data) {
   );
 
   if (!updatedSubscription) {
-    console.error("No se encontró la suscripción para actualizar.");
+    console.error("Subscription not found to update");
     return;
   }
 
-  console.log(`Suscripción actualizada: ${subscriptionId}`);
+  console.log(`Suscription successfully updated: ${subscriptionId}`);
 }
 
 async function handleSubscriptionDeleted(data) {
@@ -108,7 +108,7 @@ async function handleSubscriptionDeleted(data) {
   );
 
   if (!deletedSubscription) {
-    console.error(" No se encontró la suscripción para cancelar.");
+    console.error("Subscription not found to be cancelled");
     return;
   }
 
@@ -117,7 +117,7 @@ async function handleSubscriptionDeleted(data) {
     { subscription: null }
   );
 
-  console.log(`Suscripción cancelada: ${subscriptionId}`);
+  console.log(`Suscripción successfully cancelled: ${subscriptionId}`);
 }
 
 module.exports = router;

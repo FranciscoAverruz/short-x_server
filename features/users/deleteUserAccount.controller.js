@@ -52,7 +52,7 @@ async function deleteAccounts(req, res) {
     if (userId) {
       const user = await User.findById(userId).populate("subscription");
       if (!user) {
-        return res.status(404).json({error:"USER_NOT_FOUND", message:"Usuario no encontrado"});
+        return res.status(404).json({error:"USER_NOT_FOUND", message:"User not found"});
       }
       usersToDelete = [user];
     } else {
@@ -80,7 +80,7 @@ async function deleteAccounts(req, res) {
             });
           } catch (error) {
             console.error(
-              `Error cancelando suscripción de usuario ${user._id}:`,
+              `Error canceling the subscription for customer: ${user._id}:`,
               error
             );
             continue;
@@ -96,7 +96,7 @@ async function deleteAccounts(req, res) {
         try {
           await User.deleteOne({ _id: user._id });
         } catch (err) {
-          console.error(`Error eliminando usuario ${user._id}:`);
+          console.error(`Error deleting user: ${user._id}:`);
         }
 
         totalDeletedUrlsCount += deletedUrlsCount;
@@ -118,8 +118,8 @@ async function deleteAccounts(req, res) {
       message: `${totalDeletedUsersCount} account(s) permanently deleted along with ${totalDeletedUrlsCount} associated URLs.`,
     });
 } catch (err) {
-  console.error("Error en deleteAccounts:");
-    res.status(500).json({ error: "Error eliminando cuentas" });
+  console.error("Error in deleteAccounts:");
+    res.status(500).json({ error: "Error deleting accounts" });
   }
 }
 

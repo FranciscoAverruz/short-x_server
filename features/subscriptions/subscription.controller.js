@@ -10,12 +10,12 @@ const getSubscriptionInfo = async (req, res) => {
     const user = await User.findById(id).populate("subscription");
 
     if (!user || !user.subscription) {
-      return res.status(404).json({ success: false, message: "Suscripción no encontrada." });
+      return res.status(404).json({ success: false, message: "Subscripción not found." });
     }
 
     res.status(200).json({ success: true, subscription: user.subscription });
   } catch (error) {
-    res.status(500).json({ success: false, error: "No se pudo obtener informacion de la suscripción"});
+    res.status(500).json({ success: false, error: "Unable to retrieve subscription information"});
   }
 };
 
@@ -25,14 +25,14 @@ const updateSubscription = async (req, res) => {
   const { newPlan } = req.body;
 
   if (!newPlan) {
-    return res.status(400).json({ success: false, message: "No se ha especificado un plan válido." });
+    return res.status(400).json({ success: false, message: "A valid plan is needed" });
   }
 
   try {
     const subscription = await Subscription.findOne({ user: userId });
 
     if (!subscription || !subscription.stripeSubscriptionId) {
-      return res.status(404).json({ message: "No se encontró la suscripción..." });
+      return res.status(404).json({ message: "Subscription not found." });
     }
 
     const updatedSubscription = await updateStripeSubscription(userId, newPlan);
@@ -40,15 +40,15 @@ const updateSubscription = async (req, res) => {
     if (updatedSubscription.requiresCheckout) {
       return res.status(402).json({ 
         success: false, 
-        message: "Se requiere un pago adicional para completar el cambio de plan.",
+        message: "An additional payment is required to complete the plan change",
         checkoutUrl: updatedSubscription.checkoutUrl 
       });
     }
 
     res.status(200).json({ success: true, subscription });
   } catch (error) {
-    console.error('Error al actualizar la suscripción');
-    res.status(500).json({ success: false, error: "Hubo un error en el proceso" });
+    console.error('Error updating the subscription');
+    res.status(500).json({ success: false, error: "Error updating the subscription" });
   }
 };
 
@@ -60,7 +60,7 @@ const cancelSubscription = async (req, res) => {
     const result = await cancelStripeSubscription(id);
     res.status(200).json(result);
   } catch (error) {
-    res.status(500).json({ success: false, error: "Error Cancelando la Suscripción"});
+    res.status(500).json({ success: false, error: "Error Cancelling the subscripción"});
   }
 };
 
@@ -72,7 +72,7 @@ const suspendCancelSubscription = async (req, res) => {
     const result = await suspendStripeCancellation(id);
     res.status(200).json(result);
   } catch (error) {
-    res.status(500).json({ success: false, error: "Error procesando la suspensión" });
+    res.status(500).json({ success: false, error: "Error processing the suspension" });
   }
 };
 
@@ -83,7 +83,7 @@ const getPaymentHistory = async (req, res) => {
 
     const subscription = await Subscription.findOne({ user: userId });
     if (!subscription || !subscription.stripeCustomerId) {
-      return res.status(404).json({ message: "No se encontró el stripeCustomerId para este usuario." });
+      return res.status(404).json({ message: "user stripeCustomerId not found" });
     }
 
     const stripeCustomerId = subscription.stripeCustomerId;
@@ -92,8 +92,8 @@ const getPaymentHistory = async (req, res) => {
 
     return res.status(200).json({ payments: paymentHistory });
   } catch (error) {
-    console.error('Error al obtener el historial de pagos');
-    return res.status(500).json({ message: 'No se pudo obtener el historial de pagos.' });
+    console.error('Error retrieving payment history');
+    return res.status(500).json({ message: 'Unable to retrieve payment history' });
   }
 };
 
@@ -104,8 +104,8 @@ const getUpcomingpay = async (req, res) => {
     const invoice = await getUpcomingInvoice(userId, newPlan);
     res.json(invoice);
   } catch (error) {
-    console.error("Error obteniendo factura futura:");
-    res.status(500).json({ error: "No se pudo obtener informacion del próximo pago"});
+    console.error("Error retrieving invoice");
+    res.status(500).json({ error: "Unable to retrieve next payment information"});N
   }
 };
 

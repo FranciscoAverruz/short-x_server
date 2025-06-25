@@ -145,7 +145,7 @@ const signupUser = async (req, res) => {
       error.message === "Passwords do not match" ||
       error.message === "This email is already registered.") {
     return res.status(400).json({
-      error: error.message,  // Mensaje de error específico
+      error: error.message,
     });
   }
 

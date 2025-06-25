@@ -87,10 +87,10 @@ const stripeWebhook = async (req, res) => {
         session.subscription
       );
     } catch (err) {
-      console.error("Error al procesar el usuario o suscripción");
+      console.error("Error processing user or subscription");
       return res
         .status(500)
-        .send("Error al procesar el usuario y la suscripción.");
+        .send("Error processing user and subscription");
     }
   }
 
@@ -121,7 +121,7 @@ const verifyPayment = async (req, res) => {
     if (session.payment_status !== "paid") {
       return res
         .status(400)
-        .json({ success: false, message: "Pago no completado" });
+        .json({ success: false, message: "payment not completed"});
     }
 
     const invoice = await stripe.invoices.retrieve(session.invoice);
@@ -172,7 +172,7 @@ const verifyPayment = async (req, res) => {
     if (user.subscription) {
       return res.status(400).json({
         success: false,
-        message: "El usuario ya tiene una suscripción activa.",
+        message: "The user already has an active subscription",
       });
     }
 
@@ -194,14 +194,14 @@ const verifyPayment = async (req, res) => {
 
     return res.status(200).json({
       success: true,
-      message: "Pago confirmado y suscripción creada.",
+      message: "Payment confirmed. Subscription successfully created",
       subscription: subscription,
     });
   } catch (error) {
-    console.error("Error al verificar el pago:", error);
+    console.error("Error while verifying payment:", error);
     return res.status(500).json({
       success: false,
-      message: `Error al verificar el pago: ${error.message}`,
+      message: `Error while verifying payment: ${error.message}`,
     });
   }
 };

@@ -46,8 +46,8 @@ async function registerClick(req) {
     const url = await Url.findOne({ shortId });
 
     if (!url) {
-      console.error("URL no encontrada.");
-      return Promise.reject("URL no encontrada.");
+      console.error("URL not found.");
+      return Promise.reject("URL not found.");
     }
 
     const clickData = {
@@ -61,7 +61,7 @@ async function registerClick(req) {
     const newClick = new Click(clickData);
     await newClick.save();
 
-    return Promise.resolve("Click registrado exitosamente");
+    return Promise.resolve("Click successfully registered");
   } catch (err) {
     console.error("Error saving click:", err);
     return Promise.reject(err);

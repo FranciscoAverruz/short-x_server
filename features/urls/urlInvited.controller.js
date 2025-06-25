@@ -26,8 +26,8 @@ const shortenUrl = async (req, res) => {
     });
     
   } catch (err) {
-    console.error('Error al crear la URL');
-    res.status(500).json({ error: "Error al crear la URL"});
+    console.error('Error creating the URL');
+    res.status(500).json({ error: "Error creating the URL"});
   }
 };
 

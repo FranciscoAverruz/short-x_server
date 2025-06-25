@@ -1,5 +1,5 @@
 const express = require('express');
-const { createCheckoutSession, stripeWebhook, verifyPayment } = require('./stripe.checkout');  // Importar funciones del archivo stripe.checkout.js
+const { createCheckoutSession, stripeWebhook, verifyPayment } = require('./stripe.checkout');
 const router = express.Router();
 
 router.post('/checkout-session', createCheckoutSession);

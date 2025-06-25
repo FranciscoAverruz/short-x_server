@@ -42,7 +42,7 @@ const addCustomDomain = async (req, res) => {
       domain
     )}`;
 
-    const subject = "Verificación de Dominio Personalizado";
+    const subject = "Custom Domain Verification";
     const templatePath = path.resolve(
       __dirname,
       "../email/templates/customDomainVerificationEmail.html"
