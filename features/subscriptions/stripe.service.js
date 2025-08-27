@@ -10,7 +10,7 @@ const {
 } = require("../../config/env");
 const mongoose = require("mongoose");
 
-// function to create or updates user's subscription ********************************
+// creates or updates user's subscription *******************************************
 const handleSubscription = async (
   email,
   plan,
@@ -129,8 +129,31 @@ const updateStripeSubscription = async (userId, newPlan) => {
   const subscriptionBD = await Subscription.findOne({ user: userId });
 
   if (!subscriptionBD || !subscriptionBD.stripeSubscriptionId) {
-    throw new Error("User or Subscription not found");
+    if (newPlan.startsWith("free")) {
+      return {
+        success: true,
+        message: "User is already on a Free plan",
+      };
+    } else {
+      const newSubscription = await createStripeSubscription(
+        userId,
+        newPlan,
+        null,
+        {}
+      );
+
+      return {
+        requiresCheckout: true,
+        checkoutUrl: `${FRONTEND_URL}/dashboard/subscription/retry-payment/${newSubscription.latest_invoice.payment_intent.id}`,
+        invoiceAmount: newSubscription.latest_invoice.total / 100,
+        currency: newSubscription.latest_invoice.currency,
+      };
+    }
   }
+
+  // if (!subscriptionBD || !subscriptionBD.stripeSubscriptionId) {
+  //   throw new Error("User or Subscription not found");
+  // }
 
   if (newPlan === "free_monthly" || newPlan === "free_annual") {
     if (
