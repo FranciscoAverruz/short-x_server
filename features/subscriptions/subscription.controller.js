@@ -9,11 +9,13 @@ const getSubscriptionInfo = async (req, res) => {
     const { id } = req.params;
     const user = await User.findById(id).populate("subscription");
 
-    if (!user || !user.subscription) {
-      return res.status(404).json({ success: false, message: "Subscripción not found." });
+    if (!user) {
+      return res.status(404).json({ success: false, message: "User not found." });
     }
 
-    res.status(200).json({ success: true, subscription: user.subscription });
+    const subscriptionData = user?.subscription || null;
+
+    res.status(200).json({ success: true, subscription: subscriptionData });
   } catch (error) {
     res.status(500).json({ success: false, error: "Unable to retrieve subscription information"});
   }
@@ -79,11 +81,17 @@ const suspendCancelSubscription = async (req, res) => {
 // Gets payment history *************************************************************
 const getPaymentHistory = async (req, res) => {
   try {
-    const userId = req.user.id;
+    const userId = req.user?.id;
+
+    if (!userId) {
+      return res.status(400).json({ message: "User not authenticated" });
+    }
 
     const subscription = await Subscription.findOne({ user: userId });
+    
     if (!subscription || !subscription.stripeCustomerId) {
-      return res.status(404).json({ message: "user stripeCustomerId not found" });
+      // return res.status(404).json({ message: "user stripeCustomerId not found" });
+      return res.status(200).json({ payments: [] });
     }
 
     const stripeCustomerId = subscription.stripeCustomerId;
@@ -105,7 +113,7 @@ const getUpcomingpay = async (req, res) => {
     res.json(invoice);
   } catch (error) {
     console.error("Error retrieving invoice");
-    res.status(500).json({ error: "Unable to retrieve next payment information"});N
+    res.status(500).json({ error: "Unable to retrieve next payment information"});
   }
 };
 
