@@ -51,7 +51,6 @@ async function changePassword(req, res) {
 
     await updatePassword(user, newPassword);
 
-    console.log("Password changed successfully");
     res.status(200).json({ message: "Password changed successfully." });
   } catch (err) {
     console.error("Error changing the password:");
@@ -62,31 +61,50 @@ async function changePassword(req, res) {
 // requests Password Reset ************************************************************
 async function requestPasswordReset(req, res) {
   const { email } = req.body;
-
   try {
     const user = await User.findOne({ email });
     if (!user) {
       return res.status(404).json({ error: "UserNotFound", message: "User not found." });
     }
-
     const token = jwt.sign({ userId: user._id }, JWT_SECRET, { expiresIn: "1h" });
-    const resetLink = `${FRONTEND_URL}/reset-password?token=${token}`;
-
-    const templatePath = path.join(__dirname, '..', 'templates', 'passwordResetTemplate.html');
-
+    const resetLink = `${FRONTEND_URL}/login/reset-password?token=${token}`;
+    const templatePath = path.join(__dirname, "../email/templates/passwordResetTemplate.html");
     const replacements = { resetLink };
-
     await sendEmail(user.email, "Reset Your Password", templatePath, replacements);
-
     return res.status(200).json({ message: "Email sent. Please check your inbox." });
   } catch (error) {
-    console.error("Error requesting password reset:");
     return res.status(500).json({ error: "ServerError", message: "An error occurred while sending the email." });
+  }
+}
+
+// Password Reset *********************************************************************
+async function resetPassword(req, res) {
+  const { token, newPassword } = req.body;
+
+  if (!token || !newPassword) {
+    return res.status(400).json({ message: "Some data is missing." });
+  }
+
+  try {
+    const decoded = jwt.verify(token, JWT_SECRET);
+    const user = await User.findById(decoded.userId);
+
+    if (!user) {
+      return res.status(404).json({ message: "User not Found." });
+    }
+
+    await updatePassword(user, newPassword);
+
+    return res.status(200).json({ message: "Password updated successfully" });
+  } catch (error) {
+    console.error("Error reseting the password");
+    return res.status(400).json({ message: "Invalid or expired token" });
   }
 }
 
 module.exports = { 
   setupPassword, 
   changePassword, 
-  requestPasswordReset 
+  requestPasswordReset,
+  resetPassword
 };
