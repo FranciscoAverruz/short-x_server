@@ -9,7 +9,7 @@
 - Shorten URLs and retrieve detailed statistics for them.
 - Receive real-time updates via WebSocket functionality, making it easy to monitor changes to URLs and user statistics as they happen.
     
-🔧 **Tech Stack**
+🔧 **Tech Stack **
 
 - 🟩 Built with **Node.js** 
 - ⚡ Powered by **Express** 
